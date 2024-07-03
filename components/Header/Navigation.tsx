@@ -7,7 +7,14 @@ import { useMedia } from "react-use";
 
 import { NavButton } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const navLinks = [
   {
@@ -47,7 +54,7 @@ const Navigation = () => {
   if (isMobile) {
     return (
       <Sheet open={isOpen} onOpenChange={setOpen}>
-        <SheetTrigger>
+        <SheetTrigger asChild>
           <Button
             variant="outline"
             size="sm"
@@ -68,7 +75,10 @@ const Navigation = () => {
                 }}
                 className="w-full justify-start"
               >
-                {label}
+                <SheetHeader>
+                  <SheetTitle>{label}</SheetTitle>
+                  <SheetDescription />
+                </SheetHeader>
               </Button>
             ))}
           </nav>
