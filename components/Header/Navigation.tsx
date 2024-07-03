@@ -1,6 +1,7 @@
 "use client";
+
+import { NavButton } from "@/components/Header";
 import { usePathname } from "next/navigation";
-import NavButton from "./NavButton";
 
 const navLinks = [
   {
