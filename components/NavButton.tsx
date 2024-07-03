@@ -14,7 +14,8 @@ const NavButton = ({ href, label, isActive }: Props) => {
       size="sm"
       variant="outline"
       className={cn(
-        "focus-visible:0 w-full border-none font-normal text-white hover:bg-white/20 hover:text-white lg:w-auto",
+        "w-full border-none font-normal text-white outline-none transition hover:bg-white/20 hover:text-white lg:w-auto",
+        isActive ? "bg-white/10" : "bg-transparent",
       )}
     >
       <Link href={href}>{label}</Link>
