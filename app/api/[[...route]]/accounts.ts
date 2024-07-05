@@ -1,8 +1,8 @@
-import { Hono } from "hono";
-
-import { db, accounts } from "@/drizzle";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { eq } from "drizzle-orm";
+import { Hono } from "hono";
+
+import { accounts, db } from "@/drizzle";
 
 const app = new Hono().get("/", clerkMiddleware(), async (c) => {
   const auth = getAuth(c);

@@ -1,4 +1,4 @@
-import { hc } from "hono/client";
+import { hc } from "hono/client"; //HTTP client
 
 import { AppType } from "@/app/api/[[...route]]/route";
 
