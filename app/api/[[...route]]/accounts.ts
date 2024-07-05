@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 
-import { db } from "@/drizzle/db";
-import { accounts } from "@/drizzle/schema";
+import { db, accounts } from "@/drizzle";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { eq } from "drizzle-orm";
 
@@ -19,6 +18,7 @@ const app = new Hono().get("/", clerkMiddleware(), async (c) => {
     })
     .from(accounts)
     .where(eq(accounts.userId, auth.userId));
+
   return c.json({ data });
 });
 
