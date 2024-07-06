@@ -15,6 +15,13 @@
       "when": 1720170741435,
       "tag": "0001_grey_shooting_star",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1720268983994,
+      "tag": "0002_parallel_human_robot",
+      "breakpoints": true
     }
   ]
 }
