@@ -1,19 +1,25 @@
 "use client";
+
 import useSheet from "@/components/hooks/useSheet";
+import useBulkDeleteAccounts from "@/features/accounts/api/useBulckDelete";
 import useGetAccounts from "@/features/accounts/api/useGetAccounts";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 
-import { Columns } from "@/app/(dashboard)/accounts/Columns";
 import AccountTableSkeleton from "@/app/(dashboard)/accounts/AccountTableSkeleton";
+import { Columns } from "@/app/(dashboard)/accounts/Columns";
 import { DataTable } from "@/components/Table/DataTable";
 
 const AccountsPage = () => {
   const { onOpen } = useSheet();
   const accountsQuery = useGetAccounts();
+  const deleteAccounts = useBulkDeleteAccounts();
+
   const accounts = accountsQuery.data ?? [];
+
+  const isDisabled = accountsQuery.isLoading || deleteAccounts.isPending;
 
   if (accountsQuery.isLoading) {
     return <AccountTableSkeleton />;
@@ -33,9 +39,12 @@ const AccountsPage = () => {
           <DataTable
             columns={Columns}
             data={accounts}
-            disabled={false}
+            disabled={isDisabled}
             filterKey="name"
-            onDelete={() => {}}
+            onDelete={(row) => {
+              const ids = row.map((r) => r.original.id);
+              deleteAccounts.mutate({ ids });
+            }}
           />
         </CardContent>
       </Card>
