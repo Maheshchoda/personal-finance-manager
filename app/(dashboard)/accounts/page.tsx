@@ -6,12 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 
-import { DataTable } from "@/components/Table/DataTable";
 import { Columns } from "@/app/(dashboard)/accounts/Columns";
+import AccountTableSkeleton from "@/app/(dashboard)/accounts/AccountTableSkeleton";
+import { DataTable } from "@/components/Table/DataTable";
 
 const AccountsPage = () => {
   const { onOpen } = useSheet();
-  const accounts = useGetAccounts()?.data ?? [];
+  const accountsQuery = useGetAccounts();
+  const accounts = accountsQuery.data ?? [];
+
+  if (accountsQuery.isLoading) {
+    return <AccountTableSkeleton />;
+  }
 
   return (
     <div className="mx-auto -mt-24 w-full max-w-screen-2xl pb-10">
