@@ -15,11 +15,11 @@ import { DataTable } from "@/components/Table/DataTable";
 const AccountsPage = () => {
   const { onOpen } = useSheet();
   const accountsQuery = useGetAccounts();
-  const deleteAccounts = useBulkDeleteAccounts();
+  const deleteAccountsQuery = useBulkDeleteAccounts();
 
   const accounts = accountsQuery.data ?? [];
 
-  const isDisabled = accountsQuery.isLoading || deleteAccounts.isPending;
+  const isDisabled = accountsQuery.isLoading || deleteAccountsQuery.isPending;
 
   if (accountsQuery.isLoading) {
     return <AccountTableSkeleton />;
@@ -43,7 +43,7 @@ const AccountsPage = () => {
             filterKey="name"
             onDelete={(row) => {
               const ids = row.map((r) => r.original.id);
-              deleteAccounts.mutate({ ids });
+              deleteAccountsQuery.mutate({ ids });
             }}
           />
         </CardContent>
