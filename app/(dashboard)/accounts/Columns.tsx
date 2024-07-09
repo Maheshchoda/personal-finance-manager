@@ -1,11 +1,12 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { InferResponseType } from "hono";
 import { client } from "@/lib/hono";
+import { InferResponseType } from "hono";
+import Actions from "@/app/(dashboard)/accounts/Actions";
 
 export type AccountsResponseType = InferResponseType<
   typeof client.api.accounts.$get,
@@ -48,5 +49,9 @@ export const Columns: ColumnDef<AccountsResponseType>[] = [
         </Button>
       );
     },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <Actions id={row.original.id} />,
   },
 ];

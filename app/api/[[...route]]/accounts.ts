@@ -25,6 +25,42 @@ const app = new Hono()
 
     return c.json({ data });
   })
+  .get(
+    "/:id",
+    zValidator(
+      "param",
+      z.object({
+        id: z.string(),
+      }),
+    ),
+    clerkMiddleware(),
+    async (c) => {
+      const auth = getAuth(c);
+      if (!auth?.userId) {
+        return c.json({ error: "Un-Authorized" }, 401);
+      }
+
+      const { id } = c.req.valid("param");
+
+      if (!id) {
+        return c.json({ error: "Missing Id" }, 400);
+      }
+
+      const [data] = await db
+        .select({
+          id: accounts.id,
+          name: accounts.name,
+        })
+        .from(accounts)
+        .where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)));
+
+      if (!data) {
+        return c.json({ error: "Not found" }, 404);
+      }
+
+      return c.json({ data });
+    },
+  )
   .post(
     "/",
     clerkMiddleware(),
@@ -68,6 +104,33 @@ const app = new Hono()
         });
 
       return c.json(data);
+    },
+  )
+  .patch(
+    "/:id",
+    clerkMiddleware(),
+    zValidator("param", z.object({ id: z.string() })),
+    zValidator("json", insertAccountsSchema.pick({ name: true })),
+    async (c) => {
+      const auth = getAuth(c);
+      if (!auth?.userId) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      const { id } = c.req.valid("param");
+      if (!id) return c.json({ error: "Missing Id" }, 400);
+
+      const values = c.req.valid("json");
+
+      const [data] = await db
+        .update(accounts)
+        .set(values)
+        .returning()
+        .where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)));
+
+      if (!data) return c.json({ error: "Not found" }, 404);
+
+      return c.json({ data });
     },
   );
 

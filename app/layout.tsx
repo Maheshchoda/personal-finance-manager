@@ -1,6 +1,6 @@
+import AccountSheet from "@/components/AccountSheet";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/providers/QueryProvider";
-import SheetProvider from "@/providers/SheetProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -23,7 +23,7 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
           <QueryProvider>
-            <SheetProvider />
+            <AccountSheet />
             <Toaster />
             {children}
           </QueryProvider>
