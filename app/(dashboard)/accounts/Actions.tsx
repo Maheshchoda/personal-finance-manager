@@ -19,7 +19,7 @@ interface Props {
 const Actions = ({ id }: Props) => {
   const { onClose } = useSheet();
   const { onOpen } = useEditSheet();
-  const deleteMutation = useDeleteAccount({ id });
+  const deleteMutation = useDeleteAccount();
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
     message: "you are about to delete an account",

@@ -21,7 +21,7 @@ const EditAccountSheet = () => {
   const { id, isOpen, onClose } = useEditSheet();
   const getAccountQuery = useGetAccount({ id });
   const editMutation = useEditAccount({ id });
-  const deleteMutation = useDeleteAccount({ id });
+  const deleteMutation = useDeleteAccount();
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
     message: "you are about to delete an account",
