@@ -24,7 +24,7 @@ const EditAccountSheet = () => {
   const deleteMutation = useDeleteAccount();
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
-    message: "you are about to delete an account",
+    message: "You are about to delete an account.",
   });
 
   const isPending = editMutation.isPending || deleteMutation.isPending;
