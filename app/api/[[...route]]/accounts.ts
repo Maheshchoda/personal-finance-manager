@@ -132,6 +132,28 @@ const app = new Hono()
 
       return c.json({ data });
     },
-  );
+  )
+  .delete(
+    "/:id",
+    clerkMiddleware(),
+    zValidator("param", z.object({ id: z.string() })),
+    async (c) => {
+      const auth = getAuth(c);
 
+      if (!auth?.userId) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      const { id } = c.req.valid("param");
+
+      const data = await db
+        .delete(accounts)
+        .where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)))
+        .returning({
+          id: accounts.id,
+        });
+
+      return c.json(data);
+    },
+  );
 export default app;

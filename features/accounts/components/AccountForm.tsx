@@ -23,7 +23,7 @@ interface Props {
   id?: string;
   defaultValues?: FormType;
   onSubmit: (values: FormType) => void;
-  onDelete?: () => void;
+  onDelete?: ({ id }: { id: string }) => void;
   disabled?: boolean;
 }
 
@@ -38,13 +38,11 @@ const AccountForm = ({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues,
   });
+
   const handleSubmit = (values: FormType) => {
     onSubmit(values);
   };
 
-  const handleDelete = () => {
-    console.log("delete");
-  };
   return (
     <Form {...form}>
       <form
@@ -70,11 +68,11 @@ const AccountForm = ({
         <Button disabled={disabled} className="w-full">
           {id ? "Save" : "Create account"}
         </Button>
-        {!!id && (
+        {id && onDelete && (
           <Button
             type="button"
             disabled={disabled}
-            onClick={handleDelete}
+            onClick={() => onDelete({ id })}
             className="w-full"
             variant="outline"
           >
