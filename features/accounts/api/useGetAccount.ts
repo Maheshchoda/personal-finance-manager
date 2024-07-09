@@ -12,7 +12,6 @@ const getAccount = async ({ id }: Params) => {
   const response = await client.api.accounts[":id"].$get({ param: { id } });
   if (!response.ok) throw new Error("Failed to Fetch Account.");
   const { data } = await response.json();
-  console.log(data, "Received from Backend");
   return data;
 };
 
