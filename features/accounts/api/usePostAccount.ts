@@ -11,6 +11,9 @@ const usePostAccount = () => {
 
   const createAccount = async (json: RequestType) => {
     const response = await client.api.accounts.$post({ json });
+    if (!response.ok) {
+      throw new Error("Failed to create account");
+    }
     return await response.json();
   };
 

@@ -18,6 +18,11 @@ const useEditAccount = ({ id }: { id: string }) => {
       param: { id },
       json,
     });
+
+    if (!response.ok) {
+      throw new Error("Failed to update account");
+    }
+
     return await response.json();
   };
 
