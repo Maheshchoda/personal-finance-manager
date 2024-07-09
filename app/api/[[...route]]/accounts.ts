@@ -8,6 +8,7 @@ import { accounts, db } from "@/drizzle";
 import { insertAccountsSchema } from "@/drizzle/schema";
 
 const app = new Hono()
+  // Protected route to get all accounts for the authenticated user
   .get("/", clerkMiddleware(), async (c) => {
     const auth = getAuth(c);
 
@@ -30,6 +31,7 @@ const app = new Hono()
       return c.json({ error: "Internal Server Error" }, 500);
     }
   })
+  // Protected route to get a specific account by ID
   .get(
     "/:id",
     zValidator(
@@ -71,6 +73,7 @@ const app = new Hono()
       }
     },
   )
+  // Protected route to create a new account
   .post(
     "/",
     clerkMiddleware(),
@@ -99,6 +102,7 @@ const app = new Hono()
       }
     },
   )
+  // Protected route to bulk delete accounts
   .post(
     "/bulk-delete",
     clerkMiddleware(),
@@ -128,6 +132,7 @@ const app = new Hono()
       }
     },
   )
+  // Protected route to update a specific account by ID
   .patch(
     "/:id",
     clerkMiddleware(),
@@ -160,6 +165,7 @@ const app = new Hono()
       }
     },
   )
+  // Protected route to delete a specific account by ID
   .delete(
     "/:id",
     clerkMiddleware(),
