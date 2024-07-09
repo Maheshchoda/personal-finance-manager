@@ -5,7 +5,7 @@ type ID = string;
 type EditSheetState = {
   id: ID;
   isOpen: boolean;
-  onOpen: (id: string) => void;
+  onOpen: (id: ID) => void;
   onClose: () => void;
 };
 
