@@ -25,7 +25,7 @@ const usePostItem = ({ itemName }: ResourceType) => {
 
   const onSuccess = () => {
     toast.success(`${CapTrimEnd(itemName, true)} Created`);
-    queryClient.invalidateQueries({ queryKey: ["accounts"] });
+    queryClient.invalidateQueries({ queryKey: [itemName] });
   };
 
   const onError = () => {

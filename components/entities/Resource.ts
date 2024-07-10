@@ -1,3 +1,3 @@
 export default interface ResourceType {
-  itemName: "accounts";
+  itemName: "accounts" | "categories";
 }

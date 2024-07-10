@@ -5,10 +5,10 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { db } from "@/drizzle";
-import { account, AccountSchema } from "@/drizzle/schema";
+import { category, CategorySchema } from "@/drizzle/schema";
 
 const app = new Hono()
-  // Protected route to get all account for the authenticated user
+  // Protected route to get all categories for the authenticated user
   .get("/", clerkMiddleware(), async (c) => {
     const auth = getAuth(c);
 
@@ -19,19 +19,19 @@ const app = new Hono()
     try {
       const data = await db
         .select({
-          id: account.id,
-          name: account.name,
+          id: category.id,
+          name: category.name,
         })
-        .from(account)
-        .where(eq(account.userId, auth.userId));
+        .from(category)
+        .where(eq(category.userId, auth.userId));
 
       return c.json({ data });
     } catch (error) {
-      console.error("Error fetching account:", error);
+      console.error("Error fetching category:", error);
       return c.json({ error: "Internal Server Error" }, 500);
     }
   })
-  // Protected route to get a specific account by ID
+  // Protected route to get a specific category by ID
   .get(
     "/:id",
     zValidator(
@@ -56,11 +56,11 @@ const app = new Hono()
       try {
         const [data] = await db
           .select({
-            id: account.id,
-            name: account.name,
+            id: category.id,
+            name: category.name,
           })
-          .from(account)
-          .where(and(eq(account.userId, auth.userId), eq(account.id, id)));
+          .from(category)
+          .where(and(eq(category.userId, auth.userId), eq(category.id, id)));
 
         if (!data) {
           return c.json({ error: "Not found" }, 404);
@@ -68,16 +68,16 @@ const app = new Hono()
 
         return c.json({ data });
       } catch (error) {
-        console.error(`Error fetching account with id:${id}`, error);
+        console.error(`Error fetching category with id:${id}`, error);
         return c.json({ error: "Internal Server Error" }, 500);
       }
     },
   )
-  // Protected route to create a new account
+  // Protected route to create a new category
   .post(
     "/",
     clerkMiddleware(),
-    zValidator("json", AccountSchema.pick({ name: true })),
+    zValidator("json", CategorySchema.pick({ name: true })),
     async (c) => {
       const auth = getAuth(c);
       const values = c.req.valid("json");
@@ -88,7 +88,7 @@ const app = new Hono()
 
       try {
         const [data] = await db
-          .insert(account)
+          .insert(category)
           .values({
             userId: auth.userId,
             ...values,
@@ -102,7 +102,7 @@ const app = new Hono()
       }
     },
   )
-  // Protected route to bulk delete account
+  // Protected route to bulk delete category
   .post(
     "/bulk-delete",
     clerkMiddleware(),
@@ -117,10 +117,12 @@ const app = new Hono()
 
       try {
         const data = await db
-          .delete(account)
-          .where(and(eq(account.userId, auth.userId), inArray(account.id, ids)))
+          .delete(category)
+          .where(
+            and(eq(category.userId, auth.userId), inArray(category.id, ids)),
+          )
           .returning({
-            id: account.id,
+            id: category.id,
           });
 
         return c.json(data);
@@ -130,12 +132,12 @@ const app = new Hono()
       }
     },
   )
-  // Protected route to update a specific account by ID
+  // Protected route to update a specific category by ID
   .patch(
     "/:id",
     clerkMiddleware(),
     zValidator("param", z.object({ id: z.string() })),
-    zValidator("json", AccountSchema.pick({ name: true })),
+    zValidator("json", CategorySchema.pick({ name: true })),
     async (c) => {
       const auth = getAuth(c);
       if (!auth?.userId) {
@@ -149,21 +151,21 @@ const app = new Hono()
 
       try {
         const [data] = await db
-          .update(account)
+          .update(category)
           .set(values)
           .returning()
-          .where(and(eq(account.userId, auth.userId), eq(account.id, id)));
+          .where(and(eq(category.userId, auth.userId), eq(category.id, id)));
 
         if (!data) return c.json({ error: "Not found" }, 404);
 
         return c.json({ data });
       } catch (error) {
-        console.error(`Error while Updating account with id:${id}`, error);
+        console.error(`Error while Updating category with id:${id}`, error);
         return c.json({ error: "Internal Server Error" }, 500);
       }
     },
   )
-  // Protected route to delete a specific account by ID
+  // Protected route to delete a specific category by ID
   .delete(
     "/:id",
     clerkMiddleware(),
@@ -179,17 +181,18 @@ const app = new Hono()
 
       try {
         const data = await db
-          .delete(account)
-          .where(and(eq(account.userId, auth.userId), eq(account.id, id)))
+          .delete(category)
+          .where(and(eq(category.userId, auth.userId), eq(category.id, id)))
           .returning({
-            id: account.id,
+            id: category.id,
           });
 
         return c.json(data);
       } catch (error) {
-        console.error(`Error while deleting account with Id:${id}:`, error);
+        console.error(`Error while deleting category with Id:${id}:`, error);
         return c.json({ error: "Internal Server Error" }, 500);
       }
     },
   );
+
 export default app;
