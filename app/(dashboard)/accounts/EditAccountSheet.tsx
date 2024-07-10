@@ -6,22 +6,22 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
+import AccountForm, { FormType } from "@/app/(dashboard)/accounts/AccountForm";
+import {
+  useDeleteItem,
+  useEditItem,
+  useGetItem,
+} from "@/app/(dashboard)/hooks/api";
 import useConfirm from "@/components/hooks/useConfirm";
 import useEditSheet from "@/components/hooks/useEditSheet";
-import useEditAccount from "@/features/accounts/api/useEditAccount";
-import useGetAccount from "@/features/accounts/api/useGetAccount";
-import useDeleteAccount from "../api/useDeleteAccount";
-import AccountForm, {
-  FormType,
-} from "@/features/accounts/components/AccountForm";
 
 import { Loader2 } from "lucide-react";
 
 const EditAccountSheet = () => {
   const { id, isOpen, onClose } = useEditSheet();
-  const getAccountQuery = useGetAccount({ id });
-  const editMutation = useEditAccount({ id });
-  const deleteMutation = useDeleteAccount();
+  const getAccountQuery = useGetItem({ id, itemName: "accounts" });
+  const editMutation = useEditItem({ id, itemName: "accounts" });
+  const deleteMutation = useDeleteItem({ itemName: "accounts" });
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
     message: "You are about to delete an account.",

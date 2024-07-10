@@ -1,4 +1,4 @@
-import AccountSheet from "@/features/accounts/components/AccountSheet";
+import AccountSheet from "@/app/(dashboard)/accounts/AccountSheet";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { ClerkProvider } from "@clerk/nextjs";

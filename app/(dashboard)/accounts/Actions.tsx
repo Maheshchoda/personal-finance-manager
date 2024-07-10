@@ -1,7 +1,7 @@
 import useConfirm from "@/components/hooks/useConfirm";
 import useEditSheet from "@/components/hooks/useEditSheet";
 import useSheet from "@/components/hooks/useSheet";
-import useDeleteAccount from "@/features/accounts/api/useDeleteAccount";
+import { useDeleteItem } from "@/app/(dashboard)/hooks/api";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,7 @@ interface Props {
 const Actions = ({ id }: Props) => {
   const { onClose } = useSheet();
   const { onOpen } = useEditSheet();
-  const deleteMutation = useDeleteAccount();
+  const deleteMutation = useDeleteItem({ itemName: "accounts" });
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
     message: "you are about to delete an account",

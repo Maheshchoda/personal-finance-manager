@@ -1,8 +1,7 @@
 "use client";
 
 import useSheet from "@/components/hooks/useSheet";
-import useBulkDeleteAccounts from "@/features/accounts/api/useBulckDelete";
-import useGetAccounts from "@/features/accounts/api/useGetAccounts";
+import { useGetItems, useBulkDeleteItems } from "@/app/(dashboard)/hooks/api";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,8 +13,12 @@ import { DataTable } from "@/components/Table/DataTable";
 
 const AccountsPage = () => {
   const { onOpen } = useSheet();
-  const accountsQuery = useGetAccounts();
-  const deleteAccountsQuery = useBulkDeleteAccounts();
+  const accountsQuery = useGetItems({
+    itemName: "accounts",
+  });
+  const deleteAccountsQuery = useBulkDeleteItems({
+    itemName: "accounts",
+  });
 
   const accounts = accountsQuery.data ?? [];
 

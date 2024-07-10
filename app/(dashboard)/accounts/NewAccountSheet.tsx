@@ -7,14 +7,13 @@ import {
 } from "@/components/ui/sheet";
 
 import useSheet from "@/components/hooks/useSheet";
-import usePostAccount from "@/features/accounts/api/usePostAccount";
-import AccountForm, {
-  FormType,
-} from "@/features/accounts/components/AccountForm";
+import { usePostItem } from "@/app/(dashboard)/hooks/api";
+
+import AccountForm, { FormType } from "@/app/(dashboard)/accounts/AccountForm";
 
 const NewAccountSheet = () => {
   const { isOpen, onClose } = useSheet();
-  const mutation = usePostAccount();
+  const mutation = usePostItem({ itemName: "accounts" });
   const onSubmit = (values: FormType) => {
     mutation.mutate(values, {
       onSuccess: () => {

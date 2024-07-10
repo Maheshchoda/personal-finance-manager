@@ -1,6 +1,6 @@
 "use client";
-import EditAccountSheet from "@/features/accounts/components/EditAccountSheet";
-import NewAccountSheet from "@/features/accounts/components/NewAccountSheet";
+import NewAccountSheet from "@/app/(dashboard)/accounts/NewAccountSheet";
+import EditAccountSheet from "@/app/(dashboard)/accounts/EditAccountSheet";
 
 const AccountSheet = () => {
   return (
