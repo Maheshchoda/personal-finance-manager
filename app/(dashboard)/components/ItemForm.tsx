@@ -53,6 +53,11 @@ const ItemForm = ({
     defaultValues: defaultValues,
   });
 
+  const placeholder =
+    itemName === "categories"
+      ? "e.g. Food, Utilities, Entertainment"
+      : "e.g. Cash, Bank Account, UPI.";
+
   const handleSubmit = (values: FormType) => {
     onSubmit(values);
   };
@@ -72,7 +77,7 @@ const ItemForm = ({
               <FormControl>
                 <Input
                   disabled={disabled}
-                  placeholder="e.g. Food, Utilities, Entertainment"
+                  placeholder={placeholder}
                   {...field}
                 />
               </FormControl>
@@ -80,7 +85,7 @@ const ItemForm = ({
           )}
         />
         <Button disabled={disabled} className="w-full">
-          {id ? "Save" : `Create ${CapTrimEnd(itemName)}`}
+          {id ? "Save" : `Create ${CapTrimEnd(itemName, true)}`}
         </Button>
         {id && onDelete && (
           <Button

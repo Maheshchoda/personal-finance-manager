@@ -52,7 +52,7 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = React.useState({});
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
-    message: "you are about to perform a delete",
+    message: `You are about to delete all items. This action cannot be undone.`,
   });
 
   const table = useReactTable({

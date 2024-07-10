@@ -26,7 +26,7 @@ const EditItemSheet = ({ itemName }: ResourceType) => {
   const deleteMutation = useDeleteItem({ itemName });
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
-    message: `You are about to delete an ${CapTrimEnd(itemName)}.`,
+    message: `You are about to delete an ${CapTrimEnd(itemName, true)}.`,
   });
 
   const isPending = editMutation.isPending || deleteMutation.isPending;
@@ -59,9 +59,9 @@ const EditItemSheet = ({ itemName }: ResourceType) => {
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent className="space-y-4">
           <SheetHeader>
-            <SheetTitle>Edit {`${CapTrimEnd(itemName)}`}</SheetTitle>
+            <SheetTitle>Edit {`${CapTrimEnd(itemName, true)}`}</SheetTitle>
             <SheetDescription>
-              Update your {`${CapTrimEnd(itemName)}`} information below:
+              Update your {`${CapTrimEnd(itemName, true)}`} information below:
             </SheetDescription>
           </SheetHeader>
           {getItemQuery.isLoading ? (
