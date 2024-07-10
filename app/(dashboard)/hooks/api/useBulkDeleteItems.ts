@@ -1,5 +1,5 @@
-import ResourceType from "@/app/(dashboard)/entities/Resource";
-import CapTrimEnd from "@/app/(dashboard)/utilities/CapTrimEnd";
+import ResourceType from "@/components/entities/Resource";
+import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 import { client } from "@/lib/hono";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
