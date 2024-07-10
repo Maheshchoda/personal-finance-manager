@@ -9,11 +9,13 @@ import {
 import useSheet from "@/components/hooks/useSheet";
 import { usePostItem } from "@/app/(dashboard)/hooks/api";
 
-import AccountForm, { FormType } from "@/app/(dashboard)/accounts/AccountForm";
+import ItemForm, { FormType } from "@/app/(dashboard)/components/ItemForm";
+import ResourceType from "@/components/entities/Resource";
+import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
-const NewAccountSheet = () => {
+const NewItemSheet = ({ itemName }: ResourceType) => {
   const { isOpen, onClose } = useSheet();
-  const mutation = usePostItem({ itemName: "accounts" });
+  const mutation = usePostItem({ itemName });
   const onSubmit = (values: FormType) => {
     mutation.mutate(values, {
       onSuccess: () => {
@@ -25,12 +27,14 @@ const NewAccountSheet = () => {
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="space-y-4">
         <SheetHeader>
-          <SheetTitle>New Account</SheetTitle>
+          <SheetTitle>New {CapTrimEnd(itemName, true)}</SheetTitle>
           <SheetDescription>
-            Create a new Account to track your transactions.
+            Create a new {CapTrimEnd(itemName, true)} to track your
+            transactions.
           </SheetDescription>
         </SheetHeader>
-        <AccountForm
+        <ItemForm
+          itemName={itemName}
           onSubmit={onSubmit}
           defaultValues={{ name: "" }}
           disabled={mutation.isPending}
@@ -40,4 +44,4 @@ const NewAccountSheet = () => {
   );
 };
 
-export default NewAccountSheet;
+export default NewItemSheet;

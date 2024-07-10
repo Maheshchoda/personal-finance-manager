@@ -11,18 +11,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { Edit, MoreHorizontal, Trash } from "lucide-react";
+import ResourceType from "@/components/entities/Resource";
+import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 interface Props {
   id: string;
+  itemName: ResourceType;
 }
 
-const Actions = ({ id }: Props) => {
+const Actions = ({ id, itemName }: Props) => {
   const { onClose } = useSheet();
   const { onOpen } = useEditSheet();
-  const deleteMutation = useDeleteItem({ itemName: "accounts" });
+  const deleteMutation = useDeleteItem(itemName);
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
-    message: "you are about to delete an account",
+    message: `You are about to delete an ${CapTrimEnd(itemName.itemName, true)}`,
   });
 
   const handleDelete = async ({ id }: { id: string }) => {

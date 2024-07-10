@@ -6,7 +6,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import AccountForm, { FormType } from "@/app/(dashboard)/accounts/AccountForm";
+import ItemForm, { FormType } from "@/app/(dashboard)/components/ItemForm";
 import {
   useDeleteItem,
   useEditItem,
@@ -16,15 +16,17 @@ import useConfirm from "@/components/hooks/useConfirm";
 import useEditSheet from "@/components/hooks/useEditSheet";
 
 import { Loader2 } from "lucide-react";
+import ResourceType from "@/components/entities/Resource";
+import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
-const EditAccountSheet = () => {
+const EditItemSheet = ({ itemName }: ResourceType) => {
   const { id, isOpen, onClose } = useEditSheet();
-  const getAccountQuery = useGetItem({ id, itemName: "accounts" });
-  const editMutation = useEditItem({ id, itemName: "accounts" });
-  const deleteMutation = useDeleteItem({ itemName: "accounts" });
+  const getItemQuery = useGetItem({ id, itemName });
+  const editMutation = useEditItem({ id, itemName });
+  const deleteMutation = useDeleteItem({ itemName });
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
-    message: "You are about to delete an account.",
+    message: `You are about to delete an ${CapTrimEnd(itemName)}.`,
   });
 
   const isPending = editMutation.isPending || deleteMutation.isPending;
@@ -57,20 +59,21 @@ const EditAccountSheet = () => {
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent className="space-y-4">
           <SheetHeader>
-            <SheetTitle>Edit Account</SheetTitle>
+            <SheetTitle>Edit {`${CapTrimEnd(itemName)}`}</SheetTitle>
             <SheetDescription>
-              Update your account information below:
+              Update your {`${CapTrimEnd(itemName)}`} information below:
             </SheetDescription>
           </SheetHeader>
-          {getAccountQuery.isLoading ? (
+          {getItemQuery.isLoading ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <Loader2 className="size-4 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <AccountForm
+            <ItemForm
+              itemName={itemName}
               id={id}
               onSubmit={onSubmit}
-              defaultValues={{ name: getAccountQuery.data?.name ?? "" }}
+              defaultValues={{ name: getItemQuery.data?.name ?? "" }}
               disabled={isPending}
               onDelete={onDelete}
             />
@@ -81,4 +84,4 @@ const EditAccountSheet = () => {
   );
 };
 
-export default EditAccountSheet;
+export default EditItemSheet;

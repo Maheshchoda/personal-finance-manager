@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1720170065072,
-      "tag": "0000_spicy_falcon",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1720170741435,
-      "tag": "0001_grey_shooting_star",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1720268983994,
-      "tag": "0002_parallel_human_robot",
+      "when": 1720613665741,
+      "tag": "0000_low_blazing_skull",
       "breakpoints": true
     }
   ]

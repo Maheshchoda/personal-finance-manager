@@ -5,21 +5,33 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-import { AccountSchema } from "@/drizzle/schema";
+
+import { AccountSchema, CategorySchema } from "@/drizzle/schema";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
+import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
-export const formSchema = AccountSchema.pick({
-  name: true,
-});
+const schemas = {
+  accounts: AccountSchema,
+  categories: CategorySchema,
+};
 
-export type FormType = z.input<typeof formSchema>;
+type SchemasType = typeof schemas;
+type ItemName = keyof SchemasType;
+
+const formSchema = (itemName: ItemName) => {
+  return schemas[itemName].pick({ name: true });
+};
+
+export type FormType = z.input<ReturnType<typeof formSchema>>;
 
 interface Props {
+  itemName: ItemName;
   id?: string;
   defaultValues?: FormType;
   onSubmit: (values: FormType) => void;
@@ -27,15 +39,17 @@ interface Props {
   disabled?: boolean;
 }
 
-const AccountForm = ({
+const ItemForm = ({
+  itemName,
   id,
   defaultValues,
   onSubmit,
   onDelete,
   disabled,
 }: Props) => {
+  const schema = formSchema(itemName);
   const form = useForm<FormType>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(schema),
     defaultValues: defaultValues,
   });
 
@@ -58,7 +72,7 @@ const AccountForm = ({
               <FormControl>
                 <Input
                   disabled={disabled}
-                  placeholder="e.g Cash, Bank, Credit Card"
+                  placeholder="e.g. Food, Utilities, Entertainment"
                   {...field}
                 />
               </FormControl>
@@ -66,7 +80,7 @@ const AccountForm = ({
           )}
         />
         <Button disabled={disabled} className="w-full">
-          {id ? "Save" : "Create account"}
+          {id ? "Save" : `Create ${CapTrimEnd(itemName)}`}
         </Button>
         {id && onDelete && (
           <Button
@@ -77,7 +91,7 @@ const AccountForm = ({
             variant="outline"
           >
             <Trash className="mr-2 size-4" />
-            Delete Account
+            Delete {`${CapTrimEnd(itemName, true)}`}
           </Button>
         )}
       </form>
@@ -85,4 +99,4 @@ const AccountForm = ({
   );
 };
 
-export default AccountForm;
+export default ItemForm;

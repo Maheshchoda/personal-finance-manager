@@ -1,4 +1,3 @@
-import AccountSheet from "@/app/(dashboard)/accounts/AccountSheet";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -23,7 +22,6 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
           <QueryProvider>
-            <AccountSheet />
             <Toaster />
             {children}
           </QueryProvider>
