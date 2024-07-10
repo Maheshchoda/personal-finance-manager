@@ -5,7 +5,7 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-import { insertAccountsSchema } from "@/drizzle/schema";
+import { AccountSchema } from "@/drizzle/schema";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 
-export const formSchema = insertAccountsSchema.pick({
+export const formSchema = AccountSchema.pick({
   name: true,
 });
 

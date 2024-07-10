@@ -1,2 +1,2 @@
 export { db } from "@/drizzle/db";
-export { accounts } from "@/drizzle/schema";
+export { account as accounts } from "@/drizzle/schema";

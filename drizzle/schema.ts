@@ -2,7 +2,7 @@ import { pgTable, serial, text } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { createId } from "@paralleldrive/cuid2";
 
-export const accounts = pgTable("accounts", {
+export const account = pgTable("accounts", {
   id: text("id")
     .$defaultFn(() => createId())
     .primaryKey(),
@@ -11,4 +11,4 @@ export const accounts = pgTable("accounts", {
   name: text("name").notNull(),
 });
 
-export const insertAccountsSchema = createInsertSchema(accounts);
+export const AccountSchema = createInsertSchema(account);

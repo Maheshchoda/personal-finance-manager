@@ -5,7 +5,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { accounts, db } from "@/drizzle";
-import { insertAccountsSchema } from "@/drizzle/schema";
+import { AccountSchema } from "@/drizzle/schema";
 
 const app = new Hono()
   // Protected route to get all accounts for the authenticated user
@@ -77,7 +77,7 @@ const app = new Hono()
   .post(
     "/",
     clerkMiddleware(),
-    zValidator("json", insertAccountsSchema.pick({ name: true })),
+    zValidator("json", AccountSchema.pick({ name: true })),
     async (c) => {
       const auth = getAuth(c);
       const values = c.req.valid("json");
@@ -137,7 +137,7 @@ const app = new Hono()
     "/:id",
     clerkMiddleware(),
     zValidator("param", z.object({ id: z.string() })),
-    zValidator("json", insertAccountsSchema.pick({ name: true })),
+    zValidator("json", AccountSchema.pick({ name: true })),
     async (c) => {
       const auth = getAuth(c);
       if (!auth?.userId) {
