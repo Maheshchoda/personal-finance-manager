@@ -36,7 +36,7 @@ const useEditItem = ({ id, itemName }: Props) => {
   const onSuccess = () => {
     toast.success(`${CapTrimEnd(itemName, true)} Updated.`);
     queryClient.invalidateQueries({
-      queryKey: [`${itemName.slice(0, -1)}`, { id }],
+      queryKey: [`${CapTrimEnd(itemName, true)}`, { id }],
     });
     queryClient.invalidateQueries({ queryKey: [itemName] });
   };

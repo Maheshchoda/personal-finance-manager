@@ -21,7 +21,7 @@ const getItem = async ({ id, itemName }: Params) => {
 const useGetItem = ({ id, itemName }: Params) => {
   return useQuery({
     enabled: !!id,
-    queryKey: [[`${itemName.slice(0, -1)}`], { id }],
+    queryKey: [`${CapTrimEnd(itemName, true)}`, { id }],
     queryFn: () => getItem({ id, itemName }),
   });
 };
