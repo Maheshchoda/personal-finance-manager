@@ -25,6 +25,8 @@ const app = new Hono()
         .from(category)
         .where(eq(category.userId, auth.userId));
 
+      if (!data) return c.json({ error: "Not found" }, 404);
+
       return c.json({ data });
     } catch (error) {
       console.error("Error fetching category:", error);
@@ -95,6 +97,8 @@ const app = new Hono()
           })
           .returning();
 
+        if (!data) return c.json({ error: "Not found" }, 404);
+
         return c.json({ data });
       } catch (error) {
         console.error("Error posting data:", error);
@@ -124,6 +128,8 @@ const app = new Hono()
           .returning({
             id: category.id,
           });
+
+        if (!data) return c.json({ error: "Not found" }, 404);
 
         return c.json(data);
       } catch (error) {
@@ -186,6 +192,8 @@ const app = new Hono()
           .returning({
             id: category.id,
           });
+
+        if (!data) return c.json({ error: "Not found" }, 404);
 
         return c.json(data);
       } catch (error) {
