@@ -25,6 +25,8 @@ const app = new Hono()
         .from(account)
         .where(eq(account.userId, auth.userId));
 
+      if (!data) return c.json({ error: "Not found" }, 404);
+
       return c.json({ data });
     } catch (error) {
       console.error("Error fetching account:", error);
@@ -94,6 +96,8 @@ const app = new Hono()
             ...values,
           })
           .returning();
+
+        if (!data) return c.json({ error: "Not found" }, 404);
 
         return c.json({ data });
       } catch (error) {
@@ -184,6 +188,8 @@ const app = new Hono()
           .returning({
             id: account.id,
           });
+
+        if (!data) return c.json({ error: "Not found" }, 404);
 
         return c.json(data);
       } catch (error) {
