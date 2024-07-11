@@ -23,7 +23,9 @@ export const category = pgTable("categories", {
 });
 
 export const transaction = pgTable("transactions", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .$defaultFn(() => createId())
+    .primaryKey(),
   amount: integer("amount").notNull(),
   payee: text("payee").notNull(),
   notes: text("notes"),
