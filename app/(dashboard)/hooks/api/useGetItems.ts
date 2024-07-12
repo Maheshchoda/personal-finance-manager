@@ -9,7 +9,7 @@ const useGetItems = (itemName: ItemType) => {
   const params = useSearchParams();
   return useQuery({
     queryKey: getQueryKey(params, itemName),
-    queryFn: () => fetchData(params, itemName),
+    queryFn: fetchData(params, itemName),
   });
 };
 
@@ -29,29 +29,25 @@ const getQueryKey = (
 
 const fetchData =
   (params: ReadonlyURLSearchParams, itemName: ItemType) => async () => {
+    let response;
     if (itemName === "transactions") {
       const from = params.get("from") || "";
       const to = params.get("to") || "";
       const accountId = params.get("accountId") || "";
 
-      const response = await client.api[itemName].$get({
+      response = await client.api[itemName].$get({
         query: { from, to, accountId },
       });
-
-      return handleResponse(response, itemName);
+    } else {
+      response = await client.api[itemName].$get();
     }
 
-    const response = await client.api[itemName].$get();
-    return handleResponse(response, itemName);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${CapTrimEnd(itemName)}.`);
+    }
+
+    const { data } = await response.json();
+    return data;
   };
-
-const handleResponse = async (response: Response, itemName: string) => {
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${CapTrimEnd(itemName)}.`);
-  }
-
-  const { data } = await response.json();
-  return data;
-};
 
 export default useGetItems;

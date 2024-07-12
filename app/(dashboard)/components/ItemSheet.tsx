@@ -1,9 +1,9 @@
 "use client";
-import ResourceType from "@/components/entities/Resource";
+import { ItemType } from "@/components/entities/ItemType";
 import EditItemSheet from "./EditItemSheet";
 import NewItemSheet from "./NewItemSheet";
 
-const ItemSheet = ({ itemName }: ResourceType) => {
+const ItemSheet = ({ itemName }: { itemName: ItemType }) => {
   return (
     <>
       <EditItemSheet itemName={itemName} />
