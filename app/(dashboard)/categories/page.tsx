@@ -10,12 +10,10 @@ import { Plus } from "lucide-react";
 import { default as CategoryTableSkeleton } from "@/app/(dashboard)/components/ItemTableSkeleton";
 import Columns from "@/app/(dashboard)/components/Columns";
 import { DataTable } from "@/components/Table/DataTable";
-import ResourceType from "@/components/entities/Resource";
+import { ItemType } from "@/components/entities/ItemType";
 import ItemSheet from "../components/ItemSheet";
 
-const categoryResource: ResourceType = {
-  itemName: "categories",
-};
+const categoryResource: ItemType = "categories";
 
 const CategoriesPage = () => {
   const { onOpen } = useSheet();
@@ -32,8 +30,8 @@ const CategoriesPage = () => {
   }
 
   return (
-    <div className="mx-auto -mt-24 w-full max-w-screen-2xl pb-10">
-      <ItemSheet itemName={categoryResource.itemName} />
+    <div className="w-full pb-10 mx-auto -mt-24 max-w-screen-2xl">
+      <ItemSheet itemName={categoryResource} />
       <Card className="border-none drop-shadow-sm">
         <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
           <CardTitle className="text-xl">Categories Page</CardTitle>
