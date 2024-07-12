@@ -10,7 +10,7 @@ import Actions from "@/app/(dashboard)/components/Actions";
 import { ItemType } from "@/components/entities/ItemType";
 
 export type AccountsResponseType = InferResponseType<
-  typeof client.api.accounts.$get,
+  (typeof client.api)[ItemType]["$get"],
   200
 >["data"][0];
 
@@ -47,7 +47,7 @@ const Columns = (itemName: ItemType): ColumnDef<AccountsResponseType>[] => {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <ArrowUpDown className="w-4 h-4 ml-2" />
           </Button>
         );
       },
