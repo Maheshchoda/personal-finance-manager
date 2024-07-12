@@ -163,7 +163,37 @@ const app = new Hono()
       }
     },
   )
-  // Protected route to bulk delete transaction
+  //Protected route to bulk create transactions
+  .post(
+    "/bulk-create",
+    clerkMiddleware(),
+    zValidator("json", z.array(TransactionSchema.omit({ id: true }))),
+    async (c) => {
+      const auth = getAuth(c);
+      const values = c.req.valid("json");
+
+      if (!auth?.userId) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      try {
+        const data = await db
+          .insert(transaction)
+          .values({
+            ...values,
+          })
+          .returning();
+
+        if (!data) return c.json({ error: "Not found" }, 404);
+
+        return c.json({ data });
+      } catch (error) {
+        console.error("Error posting data:", error);
+        return c.json({ error: "Internal Server Error" }, 500);
+      }
+    },
+  )
+  // Protected route to bulk delete transactions
   .post(
     "/bulk-delete",
     clerkMiddleware(),
