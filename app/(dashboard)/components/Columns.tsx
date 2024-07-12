@@ -7,14 +7,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { client } from "@/lib/hono";
 import { InferResponseType } from "hono";
 import Actions from "@/app/(dashboard)/components/Actions";
-import ResourceType from "@/components/entities/Resource";
+import { ItemType } from "@/components/entities/ItemType";
 
 export type AccountsResponseType = InferResponseType<
   typeof client.api.accounts.$get,
   200
 >["data"][0];
 
-const Columns = (itemName: ResourceType): ColumnDef<AccountsResponseType>[] => {
+const Columns = (itemName: ItemType): ColumnDef<AccountsResponseType>[] => {
   return [
     {
       id: "select",

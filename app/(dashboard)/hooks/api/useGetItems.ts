@@ -1,10 +1,11 @@
-import ResourceType from "@/components/entities/Resource";
+import { ItemType } from "@/components/entities/ItemType";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
+
 import { client } from "@/lib/hono";
 import { QueryKey, useQuery } from "@tanstack/react-query";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 
-const useGetItems = ({ itemName }: ResourceType) => {
+const useGetItems = (itemName: ItemType) => {
   const params = useSearchParams();
   return useQuery({
     queryKey: getQueryKey(params, itemName),
@@ -14,7 +15,7 @@ const useGetItems = ({ itemName }: ResourceType) => {
 
 const getQueryKey = (
   params: ReadonlyURLSearchParams,
-  itemName: ResourceType["itemName"],
+  itemName: ItemType,
 ): QueryKey => {
   if (itemName === "transactions") {
     const from = params.get("from") || "";
@@ -27,8 +28,7 @@ const getQueryKey = (
 };
 
 const fetchData =
-  (params: ReadonlyURLSearchParams, itemName: ResourceType["itemName"]) =>
-  async () => {
+  (params: ReadonlyURLSearchParams, itemName: ItemType) => async () => {
     if (itemName === "transactions") {
       const from = params.get("from") || "";
       const to = params.get("to") || "";

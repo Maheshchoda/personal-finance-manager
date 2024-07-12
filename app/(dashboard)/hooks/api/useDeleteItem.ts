@@ -1,4 +1,4 @@
-import ResourceType from "@/components/entities/Resource";
+import { ItemType } from "@/components/entities/ItemType";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 import { client } from "@/lib/hono";
@@ -6,15 +6,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 import { toast } from "sonner";
 
-const useDeleteItem = ({ itemName }: ResourceType) => {
-  const queryClient = useQueryClient();
+type RequestType = InferRequestType<
+  (typeof client.api)[ItemType][":id"]["$delete"]
+>["param"];
+type ResponseType = InferResponseType<
+  (typeof client.api)[ItemType][":id"]["$delete"]
+>;
 
-  type RequestType = InferRequestType<
-    (typeof client.api)[ResourceType["itemName"]][":id"]["$delete"]
-  >["param"];
-  type ResponseType = InferResponseType<
-    (typeof client.api)[ResourceType["itemName"]][":id"]["$delete"]
-  >;
+const useDeleteItem = (itemName: ItemType) => {
+  const queryClient = useQueryClient();
 
   const deleteItem = async ({ id }: RequestType) => {
     const response = await client.api[itemName][":id"]["$delete"]({

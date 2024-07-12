@@ -1,30 +1,52 @@
-import ResourceType from "@/components/entities/Resource";
+import { ItemType } from "@/components/entities/ItemType";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 import { client } from "@/lib/hono";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 import { toast } from "sonner";
 
-const usePostItem = ({ itemName }: ResourceType) => {
+const usePostItem = (itemName: ItemType) => {
   const queryClient = useQueryClient();
 
-  type RequestType = InferRequestType<
-    (typeof client.api)[ResourceType["itemName"]]["$post"]
+  // Define types for transactions
+  type TransactionRequestType = InferRequestType<
+    (typeof client.api)["transactions"]["$post"]
   >["json"];
-  type ResponseType = InferResponseType<
-    (typeof client.api)[ResourceType["itemName"]]["$post"]
+  type TransactionResponseType = InferResponseType<
+    (typeof client.api)["transactions"]["$post"]
   >;
 
+  // Define types for other item types excluding transactions
+  type DefaultRequestType = InferRequestType<
+    (typeof client.api)[Exclude<ItemType, "transactions">]["$post"]
+  >["json"];
+  type DefaultResponseType = InferResponseType<
+    (typeof client.api)[Exclude<ItemType, "transactions">]["$post"]
+  >;
+
+  type RequestType = TransactionRequestType | DefaultRequestType;
+  type ResponseType = TransactionResponseType | DefaultResponseType;
+
   const createItem = async (json: RequestType) => {
-    const response = await client.api[itemName].$post({ json });
+    const response =
+      itemName === "transactions"
+        ? await client.api.transactions.$post({
+            json: json as TransactionRequestType,
+          })
+        : await client.api[itemName].$post({
+            json: json as DefaultRequestType,
+          });
+
     if (!response.ok) {
       throw new Error(`Failed to create ${CapTrimEnd(itemName, true)}`);
     }
-    return await response.json();
+
+    return response.json();
   };
 
   const onSuccess = () => {
-    toast.success(`${CapTrimEnd(itemName, true)} Created`);
+    const trimmedName = CapTrimEnd(itemName, true);
+    toast.success(`${trimmedName} Created`);
     queryClient.invalidateQueries({ queryKey: [itemName] });
   };
 

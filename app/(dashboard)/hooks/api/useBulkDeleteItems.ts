@@ -1,4 +1,4 @@
-import ResourceType from "@/components/entities/Resource";
+import { ItemType } from "@/components/entities/ItemType";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 import { client } from "@/lib/hono";
@@ -6,15 +6,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 import { toast } from "sonner";
 
-const useBulkDeleteItems = ({ itemName }: ResourceType) => {
-  const queryClient = useQueryClient();
+type RequestType = InferRequestType<
+  (typeof client.api)[ItemType]["bulk-delete"]["$post"]
+>["json"];
+type ResponseType = InferResponseType<
+  (typeof client.api)[ItemType]["bulk-delete"]["$post"]
+>;
 
-  type RequestType = InferRequestType<
-    (typeof client.api)[ResourceType["itemName"]]["bulk-delete"]["$post"]
-  >["json"];
-  type ResponseType = InferResponseType<
-    (typeof client.api)[ResourceType["itemName"]]["bulk-delete"]["$post"]
-  >;
+const useBulkDeleteItems = (itemName: ItemType) => {
+  const queryClient = useQueryClient();
 
   const deleteItem = async (json: RequestType) => {
     const response = await client.api[itemName]["bulk-delete"]["$post"]({
