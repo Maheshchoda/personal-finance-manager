@@ -3,6 +3,7 @@ import { relations } from "drizzle-orm";
 
 import { createInsertSchema } from "drizzle-zod";
 import { createId } from "@paralleldrive/cuid2";
+import { z } from "zod";
 
 export const account = pgTable("accounts", {
   id: text("id")
@@ -30,9 +31,11 @@ export const transaction = pgTable("transactions", {
   payee: text("payee").notNull(),
   notes: text("notes"),
   date: timestamp("date", { mode: "date" }).notNull(),
-  accountId: text("account_id").references(() => account.id, {
-    onDelete: "cascade",
-  }),
+  accountId: text("account_id")
+    .references(() => account.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
   categoryId: text("category_id").references(() => category.id, {
     onDelete: "set null",
   }),
@@ -59,4 +62,6 @@ export const transactionRelations = relations(transaction, ({ one }) => ({
 
 export const AccountSchema = createInsertSchema(account);
 export const CategorySchema = createInsertSchema(category);
-export const TransactionSchema = createInsertSchema(transaction);
+export const TransactionSchema = createInsertSchema(transaction, {
+  date: z.coerce.date(),
+});
