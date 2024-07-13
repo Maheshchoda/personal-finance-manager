@@ -10,10 +10,11 @@ const usePostItem = (itemName: ItemType) => {
 
   // Define types for transactions
   type TransactionRequestType = InferRequestType<
-    (typeof client.api)["transactions"]["$post"]
+    typeof client.api.transactions.$post
   >["json"];
+
   type TransactionResponseType = InferResponseType<
-    (typeof client.api)["transactions"]["$post"]
+    typeof client.api.transactions.$post
   >;
 
   // Define types for other item types excluding transactions
@@ -36,7 +37,6 @@ const usePostItem = (itemName: ItemType) => {
         : await client.api[itemName].$post({
             json: json as DefaultRequestType,
           });
-
     if (!response.ok) {
       throw new Error(`Failed to create ${CapTrimEnd(itemName, true)}`);
     }
