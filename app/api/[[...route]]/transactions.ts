@@ -24,7 +24,7 @@ const app = new Hono()
       z.object({
         from: z.string().optional(),
         to: z.string().optional(),
-        accountId: z.string(),
+        accountId: z.string().optional(),
       }),
     ),
     async (c) => {
@@ -65,8 +65,7 @@ const app = new Hono()
           // Apply filters
           .where(
             and(
-              // accountId ? eq(transaction.accountId, accountId) : undefined, // Filter by accountId if provided
-              eq(transaction.accountId, accountId),
+              accountId ? eq(transaction.accountId, accountId) : undefined,
               eq(account.userId, auth.userId), // Filter by authenticated user's userId
               gte(transaction.date, startDate), // Filter by startDate
               lte(transaction.date, endDate), // Filter by endDate
