@@ -16,18 +16,32 @@ import useConfirm from "@/components/hooks/useConfirm";
 import useEditSheet from "@/components/hooks/useEditSheet";
 
 import { Loader2 } from "lucide-react";
-import ResourceType from "@/components/entities/Resource";
+import { ItemType } from "@/components/entities/ItemType";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
-const EditItemSheet = ({ itemName }: ResourceType) => {
+const EditItemSheet = ({
+  itemName,
+}: {
+  itemName: Exclude<ItemType, "transactions">;
+}) => {
   const { id, isOpen, onClose } = useEditSheet();
   const getItemQuery = useGetItem({ id, itemName });
   const editMutation = useEditItem({ id, itemName });
-  const deleteMutation = useDeleteItem({ itemName });
+  const deleteMutation = useDeleteItem(itemName);
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
     message: `You are about to delete an ${CapTrimEnd(itemName, true)}.`,
   });
+
+  const defaultValues = { name: "" };
+
+  if (
+    getItemQuery.data &&
+    !Array.isArray(getItemQuery.data) &&
+    "name" in getItemQuery.data
+  ) {
+    defaultValues.name = getItemQuery.data.name;
+  }
 
   const isPending = editMutation.isPending || deleteMutation.isPending;
 
@@ -73,7 +87,7 @@ const EditItemSheet = ({ itemName }: ResourceType) => {
               itemName={itemName}
               id={id}
               onSubmit={onSubmit}
-              defaultValues={{ name: getItemQuery.data?.name ?? "" }}
+              defaultValues={defaultValues}
               disabled={isPending}
               onDelete={onDelete}
             />
