@@ -33,15 +33,7 @@ const EditItemSheet = ({
     message: `You are about to delete an ${CapTrimEnd(itemName, true)}.`,
   });
 
-  const defaultValues = { name: "" };
-
-  if (
-    getItemQuery.data &&
-    !Array.isArray(getItemQuery.data) &&
-    "name" in getItemQuery.data
-  ) {
-    defaultValues.name = getItemQuery.data.name;
-  }
+  const defaultValues = { name: getItemQuery?.data?.name || "" };
 
   const isPending = editMutation.isPending || deleteMutation.isPending;
 
