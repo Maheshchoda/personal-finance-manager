@@ -3,7 +3,7 @@ import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 import { client } from "@/lib/hono";
 import { QueryKey, useQuery } from "@tanstack/react-query";
-import { InferRequestType, InferResponseType } from "hono";
+import { InferResponseType } from "hono";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 
 type TransactionResponseType = InferResponseType<
@@ -22,54 +22,45 @@ type ResponseType<T extends ItemType> = T extends "transactions"
 
 const useGetItems = <T extends ItemType>(itemName: T) => {
   const params = useSearchParams();
+
+  const fetchData = async (): Promise<ResponseType<T>> => {
+    const queryParams = getQueryParams(itemName, params);
+    const response = await client.api[itemName].$get({ query: queryParams });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${CapTrimEnd(itemName)}.`);
+    }
+
+    const { data } = await response.json();
+    return data as ResponseType<T>;
+  };
+
   return useQuery<ResponseType<T>, Error>({
-    queryKey: getQueryKey<T>(params, itemName),
-    queryFn: () => fetchData(params, itemName),
+    queryKey: getQueryKey(itemName, params),
+    queryFn: fetchData,
   });
 };
 
 const getQueryKey = <T extends ItemType>(
-  params: ReadonlyURLSearchParams,
   itemName: T,
+  params: ReadonlyURLSearchParams,
 ): QueryKey => {
-  if (itemName === "transactions") {
-    const from = params.get("from") || "";
-    const to = params.get("to") || "";
-    const accountId = params.get("accountId") || "";
-    return [itemName, { from, to, accountId }];
-  }
-
-  return [itemName];
+  const queryParams = getQueryParams(itemName, params);
+  return [itemName, queryParams];
 };
 
-const fetchData = async <T extends ItemType>(
-  params: ReadonlyURLSearchParams,
+const getQueryParams = (
   itemName: ItemType,
-): Promise<ResponseType<T>> => {
-  let response;
+  params: ReadonlyURLSearchParams,
+) => {
   if (itemName === "transactions") {
-    const from = params.get("from") || "";
-    const to = params.get("to") || "";
-    const accountId = params.get("accountId") || "";
-
-    response = await client.api[itemName].$get({
-      query: { from, to, accountId },
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${CapTrimEnd(itemName)}.`);
-    }
-
-    const { data } = await response.json();
-    return data as ResponseType<T>;
-  } else {
-    response = await client.api[itemName].$get();
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${CapTrimEnd(itemName)}.`);
-    }
-
-    const { data } = await response.json();
-    return data as ResponseType<T>;
+    return {
+      from: params.get("from") || "",
+      to: params.get("to") || "",
+      accountId: params.get("accountId") || "",
+    };
   }
+  return {};
 };
 
 export default useGetItems;
