@@ -7,48 +7,48 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 
-import { default as CategoryTableSkeleton } from "@/app/(dashboard)/components/ItemTableSkeleton";
+import { default as AccountTableSkeleton } from "@/app/(dashboard)/components/ItemTableSkeleton";
 import Columns from "@/app/(dashboard)/components/Columns";
 import { DataTable } from "@/components/Table/DataTable";
 import { ItemType } from "@/components/entities/ItemType";
-import ItemSheet from "../components/ItemSheet";
+import ItemSheet from "@/app/(dashboard)/components/ItemSheet";
 
-const categoryResource: ItemType = "categories";
+const accountType: ItemType = "accounts";
 
-const CategoriesPage = () => {
+const AccountsPage = () => {
   const { onOpen } = useSheet();
-  const categoriesQuery = useGetItems(categoryResource);
-  const deleteCategoryMutation = useBulkDeleteItems(categoryResource);
+  const accountsQuery = useGetItems(accountType);
+  const deleteAccountsMutation = useBulkDeleteItems(accountType);
 
-  const categories = categoriesQuery.data ?? [];
+  const accounts = accountsQuery.data ?? [];
 
   const disabledActions =
-    categoriesQuery.isLoading || deleteCategoryMutation.isPending;
+    accountsQuery.isLoading || deleteAccountsMutation.isPending;
 
-  if (categoriesQuery.isLoading) {
-    return <CategoryTableSkeleton />;
+  if (accountsQuery.isLoading) {
+    return <AccountTableSkeleton />;
   }
 
   return (
-    <div className="w-full pb-10 mx-auto -mt-24 max-w-screen-2xl">
-      <ItemSheet itemName={categoryResource} />
+    <div className="mx-auto -mt-24 w-full max-w-screen-2xl pb-10">
+      <ItemSheet itemName={accountType} />
       <Card className="border-none drop-shadow-sm">
         <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
-          <CardTitle className="text-xl">Categories Page</CardTitle>
+          <CardTitle className="text-xl">Accounts Page</CardTitle>
           <Button onClick={onOpen}>
             <Plus className="mr-2 size-4" />
-            New Category
+            New Account
           </Button>
         </CardHeader>
         <CardContent>
           <DataTable
-            columns={Columns(categoryResource)}
-            data={categories}
+            columns={Columns(accountType)}
+            data={accounts}
             disabled={disabledActions}
             filterKey="name"
             onDelete={(rows) => {
               const ids = rows.map((row) => row.original.id);
-              deleteCategoryMutation.mutate({ ids });
+              deleteAccountsMutation.mutate({ ids });
             }}
           />
         </CardContent>
@@ -57,4 +57,4 @@ const CategoriesPage = () => {
   );
 };
 
-export default CategoriesPage;
+export default AccountsPage;

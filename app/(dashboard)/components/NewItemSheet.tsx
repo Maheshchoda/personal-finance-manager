@@ -13,7 +13,11 @@ import ItemForm, { FormType } from "@/app/(dashboard)/components/ItemForm";
 import { ItemType } from "@/components/entities/ItemType";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
-const NewItemSheet = ({ itemName }: { itemName: ItemType }) => {
+const NewItemSheet = ({
+  itemName,
+}: {
+  itemName: Exclude<ItemType, "transactions">;
+}) => {
   const { isOpen, onClose } = useSheet();
   const mutation = usePostItem(itemName);
   const onSubmit = (values: FormType) => {
