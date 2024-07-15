@@ -125,7 +125,7 @@ const app = new Hono()
           return c.json({ error: "Not found" }, 404);
         }
 
-        return c.json({ data });
+        return c.json({ data: data[0] });
       } catch (error) {
         console.error(`Error fetching transaction with id:${id}`, error);
         return c.json({ error: "Internal Server Error" }, 500);
