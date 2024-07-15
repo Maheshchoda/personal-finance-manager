@@ -12,12 +12,13 @@ import Columns from "@/app/(dashboard)/components/Columns";
 import { DataTable } from "@/components/Table/DataTable";
 import { ItemType } from "@/components/entities/ItemType";
 import ItemSheet from "@/app/(dashboard)/components/ItemSheet";
+import { TransactionType } from "@/drizzle/schema";
 
 const transactionResource: ItemType = "transactions";
 
 const TransactionsPage = () => {
   const { onOpen } = useSheet();
-  const transactionsQuery = useGetItems(transactionResource);
+  const transactionsQuery = useGetItems("transactions");
   const deleteTransactionMutation = useBulkDeleteItems(transactionResource);
 
   const transactions = transactionsQuery.data ?? [];

@@ -65,3 +65,7 @@ export const CategorySchema = createInsertSchema(category);
 export const TransactionSchema = createInsertSchema(transaction, {
   date: z.coerce.date(),
 });
+
+export type AccountType = z.infer<typeof AccountSchema>;
+export type CategoryType = z.infer<typeof CategorySchema>;
+export type TransactionType = z.infer<typeof TransactionSchema>;
