@@ -6,11 +6,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import useSheet from "@/components/hooks/useSheet";
 import { usePostItem } from "@/app/(dashboard)/hooks/api";
 
 import ItemForm, { FormType } from "@/app/(dashboard)/components/ItemForm";
 import { ItemType } from "@/components/entities/ItemType";
+import useEditSheet from "@/components/hooks/useEditSheet";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 const NewItemSheet = ({
@@ -18,17 +18,17 @@ const NewItemSheet = ({
 }: {
   itemName: Exclude<ItemType, "transactions">;
 }) => {
-  const { isOpen, onClose } = useSheet();
+  const { newSheetOpen, openNewSheet, closeNewSheet } = useEditSheet();
   const mutation = usePostItem(itemName);
   const onSubmit = (values: FormType) => {
     mutation.mutate(values, {
       onSuccess: () => {
-        onClose();
+        closeNewSheet();
       },
     });
   };
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
+    <Sheet open={newSheetOpen} onOpenChange={closeNewSheet}>
       <SheetContent className="space-y-4">
         <SheetHeader>
           <SheetTitle>New {CapTrimEnd(itemName, true)}</SheetTitle>

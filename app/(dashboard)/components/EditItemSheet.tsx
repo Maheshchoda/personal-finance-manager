@@ -20,11 +20,14 @@ import { ItemType } from "@/components/entities/ItemType";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 const EditItemSheet = ({
+  id,
   itemName,
 }: {
+  id: string;
   itemName: Exclude<ItemType, "transactions">;
 }) => {
-  const { id, isOpen, onClose } = useEditSheet();
+  const { isOpen, onClose } = useEditSheet();
+  const ItemOpen = isOpen(id);
   const getItemQuery = useGetItem({ id, itemName });
   const editMutation = useEditItem({ id, itemName });
   const deleteMutation = useDeleteItem(itemName);
@@ -40,7 +43,7 @@ const EditItemSheet = ({
   const onSubmit = (values: FormType) => {
     editMutation.mutate(values, {
       onSuccess: () => {
-        onClose();
+        onClose(id);
       },
     });
   };
@@ -52,7 +55,7 @@ const EditItemSheet = ({
         { id },
         {
           onSuccess: () => {
-            onClose();
+            onClose(id);
           },
         },
       );
@@ -62,7 +65,7 @@ const EditItemSheet = ({
   return (
     <div>
       <ConfirmationDialog />
-      <Sheet open={isOpen} onOpenChange={onClose}>
+      <Sheet open={ItemOpen} onOpenChange={() => onClose(id)}>
         <SheetContent className="space-y-4">
           <SheetHeader>
             <SheetTitle>Edit {`${CapTrimEnd(itemName, true)}`}</SheetTitle>

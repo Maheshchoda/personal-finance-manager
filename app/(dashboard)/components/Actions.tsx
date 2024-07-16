@@ -1,18 +1,18 @@
+import { useDeleteItem } from "@/app/(dashboard)/hooks/api";
 import useConfirm from "@/components/hooks/useConfirm";
 import useEditSheet from "@/components/hooks/useEditSheet";
-import useSheet from "@/components/hooks/useSheet";
-import { useDeleteItem } from "@/app/(dashboard)/hooks/api";
 
+import ItemSheet from "@/app/(dashboard)/components/ItemSheet";
+import { ItemType } from "@/components/entities/ItemType";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { Edit, MoreHorizontal, Trash } from "lucide-react";
-import { ItemType } from "@/components/entities/ItemType";
-import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 interface Props {
   id: string;
@@ -20,8 +20,7 @@ interface Props {
 }
 
 const Actions = ({ id, itemName }: Props) => {
-  const { onClose } = useSheet();
-  const { onOpen } = useEditSheet();
+  const { onOpen, onClose } = useEditSheet();
   const deleteMutation = useDeleteItem(itemName);
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
@@ -35,7 +34,7 @@ const Actions = ({ id, itemName }: Props) => {
         { id },
         {
           onSuccess: () => {
-            onClose();
+            onClose(id);
           },
         },
       );
@@ -43,6 +42,7 @@ const Actions = ({ id, itemName }: Props) => {
   };
   return (
     <>
+      <ItemSheet id={id} itemName={itemName} />
       <ConfirmationDialog />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

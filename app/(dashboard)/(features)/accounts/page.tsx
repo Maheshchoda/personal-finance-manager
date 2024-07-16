@@ -12,11 +12,12 @@ import Columns from "@/app/(dashboard)/components/Columns";
 import { DataTable } from "@/components/Table/DataTable";
 import { ItemType } from "@/components/entities/ItemType";
 import ItemSheet from "@/app/(dashboard)/components/ItemSheet";
+import useEditSheet from "@/components/hooks/useEditSheet";
 
 const accountType: ItemType = "accounts";
 
 const AccountsPage = () => {
-  const { onOpen } = useSheet();
+  const { openNewSheet } = useEditSheet();
   const accountsQuery = useGetItems(accountType);
   const deleteAccountsMutation = useBulkDeleteItems(accountType);
 
@@ -35,7 +36,7 @@ const AccountsPage = () => {
       <Card className="border-none drop-shadow-sm">
         <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
           <CardTitle className="text-xl">Accounts Page</CardTitle>
-          <Button onClick={onOpen}>
+          <Button onClick={() => openNewSheet()}>
             <Plus className="mr-2 size-4" />
             New Account
           </Button>

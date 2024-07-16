@@ -13,13 +13,14 @@ import {
 } from "@/app/(dashboard)/hooks/api";
 import useConfirm from "@/components/hooks/useConfirm";
 
-import useSheet from "@/components/hooks/useSheet";
+import useEditSheet from "@/components/hooks/useEditSheet";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 import { Loader2 } from "lucide-react";
 import TransactionForm, { TransactionApiFormValues } from "./TransactionForm";
 
-const TransactionSheet = () => {
-  const { isOpen, onClose } = useSheet();
+const TransactionSheet = ({ id }: { id?: string }) => {
+  const { newSheetOpen, closeNewSheet, isOpen, onClose } = useEditSheet();
+  const TransactionOpen = id ? isOpen(id) : newSheetOpen;
   const newTransaction = usePostItem("transactions");
   const deleteTransaction = useDeleteItem("transactions");
 
@@ -62,7 +63,7 @@ const TransactionSheet = () => {
     console.log(JSON.stringify(values), "Getting values");
     newTransaction.mutate(values, {
       onSuccess: () => {
-        onClose();
+        id && onClose(id);
       },
     });
   };
@@ -74,7 +75,7 @@ const TransactionSheet = () => {
         { id },
         {
           onSuccess: () => {
-            onClose();
+            onClose(id);
           },
         },
       );
@@ -84,7 +85,12 @@ const TransactionSheet = () => {
   return (
     <div>
       <ConfirmationDialog />
-      <Sheet open={isOpen} onOpenChange={onClose}>
+      <Sheet
+        open={TransactionOpen}
+        onOpenChange={() => {
+          return id ? onClose(id) : closeNewSheet();
+        }}
+      >
         <SheetContent className="space-y-4">
           <SheetHeader>
             <SheetTitle>

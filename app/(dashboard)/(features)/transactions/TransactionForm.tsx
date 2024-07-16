@@ -9,6 +9,7 @@ import {
 import AmountInput from "@/app/(dashboard)/components/AmountInput";
 import DatePicker from "@/app/(dashboard)/components/DatePicker";
 import { Select } from "@/app/(dashboard)/components/Select";
+import useEditSheet from "@/components/hooks/useEditSheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,6 +34,7 @@ type TransactionFormType = z.input<typeof formSchema>;
 export type TransactionApiFormValues = z.input<typeof transactionApiSchema>;
 
 interface Props {
+  id?: string;
   defaultValues?: TransactionFormType;
   onSubmit: (values: TransactionApiFormValues) => void;
   onDelete?: (id: string) => void;
@@ -44,6 +46,7 @@ interface Props {
 }
 
 const TransactionForm = ({
+  id,
   defaultValues,
   onSubmit,
   onDelete,
@@ -53,6 +56,7 @@ const TransactionForm = ({
   categoryOptions,
   onCategoryCreation,
 }: Props) => {
+  const { onClose, closeNewSheet } = useEditSheet();
   const form = useForm<TransactionFormType>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues,
@@ -65,6 +69,7 @@ const TransactionForm = ({
       ...values,
       amount: amountInMiliUnits,
     });
+    id ? onClose(id) : closeNewSheet();
   };
 
   return (

@@ -1,17 +1,20 @@
 "use client";
+import TransactionSheet from "@/app/(dashboard)/(features)/transactions/TransactionSheet";
 import { ItemType } from "@/components/entities/ItemType";
 import EditItemSheet from "./EditItemSheet";
 import NewItemSheet from "./NewItemSheet";
-import TransactionSheet from "@/app/(dashboard)/(features)/transactions/TransactionSheet";
 
-const ItemSheet = ({ itemName }: { itemName: ItemType }) => {
+const ItemSheet = ({ id, itemName }: { id?: string; itemName: ItemType }) => {
   if (itemName === "transactions") {
-    return <TransactionSheet />;
+    return <TransactionSheet id={id} />;
   }
   return (
     <>
-      <EditItemSheet itemName={itemName} />
-      <NewItemSheet itemName={itemName} />
+      {id ? (
+        <EditItemSheet id={id} itemName={itemName} />
+      ) : (
+        <NewItemSheet itemName={itemName} />
+      )}
     </>
   );
 };
