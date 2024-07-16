@@ -2,6 +2,7 @@
 
 import Actions from "@/app/(dashboard)/components/Actions";
 import { ItemType } from "@/components/entities/ItemType";
+import useEditSheet from "@/components/hooks/useEditSheet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,6 +13,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { InferResponseType } from "hono";
 import { ArrowUpDown } from "lucide-react";
+import EditItemSheet from "./EditItemSheet";
+import { useEditItem } from "../hooks/api";
 
 type TransactionResponseType = InferResponseType<
   typeof client.api.transactions.$get,
@@ -80,7 +83,12 @@ const createColumns = <T extends ItemType>(
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
-        cell: ({ row }) => <span>{row.original.account}</span>,
+        cell: ({ row }) => (
+          <AccountColumn
+            accountId={row.original.accountId}
+            account={row.original.account}
+          />
+        ),
       },
       {
         accessorKey: "category",
@@ -93,7 +101,12 @@ const createColumns = <T extends ItemType>(
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
-        cell: ({ row }) => <span>{row.original.category}</span>,
+        cell: ({ row }) => (
+          <CategoryColumn
+            categoryId={row.original.categoryId}
+            category={row.original.category}
+          />
+        ),
       },
       {
         accessorKey: "date",
@@ -169,6 +182,62 @@ const createColumns = <T extends ItemType>(
   }
 };
 
-const AccountColumn = (account: string, accountId: string) => {};
+const AccountColumn = ({
+  accountId,
+  account,
+}: {
+  accountId: string;
+  account: string;
+}) => {
+  const { isOpen, onOpen, onClose } = useEditSheet();
+  const AccountOpen = isOpen(accountId);
+  const onClick = () => {
+    AccountOpen ? onClose(accountId) : onOpen(accountId);
+  };
+  return (
+    <div>
+      {AccountOpen ? (
+        <EditItemSheet id={accountId} itemName="accounts" />
+      ) : (
+        <div
+          onClick={onClick}
+          className="flex cursor-pointer items-center hover:underline"
+        >
+          {account}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const CategoryColumn = ({
+  categoryId,
+  category,
+}: {
+  categoryId: string | null;
+  category: string | null;
+}) => {
+  const { isOpen, onOpen } = useEditSheet();
+  const CategoryOpen = categoryId && isOpen(categoryId);
+  const onClick = () => {
+    if (categoryId) {
+      onOpen(categoryId);
+    }
+  };
+  return (
+    <div>
+      {categoryId && CategoryOpen ? (
+        <EditItemSheet id={categoryId} itemName="categories" />
+      ) : (
+        <div
+          onClick={onClick}
+          className="flex cursor-pointer items-center hover:underline"
+        >
+          {category}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default createColumns;
