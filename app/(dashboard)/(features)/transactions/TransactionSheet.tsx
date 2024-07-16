@@ -8,6 +8,8 @@ import {
 
 import {
   useDeleteItem,
+  useEditItem,
+  useGetItem,
   useGetItems,
   usePostItem,
 } from "@/app/(dashboard)/hooks/api";
@@ -18,34 +20,50 @@ import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 import { Loader2 } from "lucide-react";
 import TransactionForm, { TransactionApiFormValues } from "./TransactionForm";
 
-const TransactionSheet = ({ id }: { id?: string }) => {
+const TransactionSheet = ({ id }: { id: string }) => {
   const { newSheetOpen, closeNewSheet, isOpen, onClose } = useEditSheet();
   const TransactionOpen = id ? isOpen(id) : newSheetOpen;
   const newTransaction = usePostItem("transactions");
+
+  const transactionQuery = useGetItem({ id: id, itemName: "transactions" });
   const deleteTransaction = useDeleteItem("transactions");
+  const editTransaction = useEditItem({ id: id, itemName: "transactions" });
+  const defaultValues = transactionQuery.data
+    ? {
+        accountId: transactionQuery.data.accountId,
+        categoryId: transactionQuery.data.categoryId,
+        amount: transactionQuery.data.amount.toString(),
+        date: transactionQuery.data.date
+          ? new Date(transactionQuery.data.date)
+          : new Date(),
+        payee: transactionQuery.data.payee,
+        notes: transactionQuery.data.notes,
+      }
+    : {
+        accountId: "",
+        categoryId: "",
+        amount: "",
+        date: new Date(),
+        payee: "",
+        notes: "",
+      };
 
   const accountMutation = usePostItem("accounts");
   const accountQuery = useGetItems("accounts");
   const onAccountCreation = (name: string) => accountMutation.mutate({ name });
-  const accountOptions = (accountQuery.data ?? []).map((item) => {
-    if ("name" in item) {
-      return { label: item.name, value: item.id };
-    } else {
-      throw new Error(`Expected Account to have a name property`);
-    }
-  });
+  const accountOptions = (accountQuery.data ?? []).map((item) => ({
+    label: item.name,
+    value: item.id,
+  }));
 
   const categoryMutation = usePostItem("categories");
   const categoryQuery = useGetItems("categories");
   const onCategoryCreation = (name: string) =>
     categoryMutation.mutate({ name });
-  const categoryOptions = (categoryQuery.data ?? []).map((item) => {
-    if ("name" in item) {
-      return { label: item.name, value: item.id };
-    } else {
-      throw new Error(`Expected Account to have a name property`);
-    }
-  });
+  const categoryOptions = (categoryQuery.data ?? []).map((item) => ({
+    label: item.name,
+    value: item.id,
+  }));
 
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
@@ -60,12 +78,22 @@ const TransactionSheet = ({ id }: { id?: string }) => {
     categoryMutation?.isPending;
 
   const onSubmit = (values: TransactionApiFormValues) => {
-    console.log(JSON.stringify(values), "Getting values");
-    newTransaction.mutate(values, {
-      onSuccess: () => {
-        id && onClose(id);
-      },
-    });
+    if (id) {
+      console.log("edit block");
+      console.log(values, "from the values");
+      editTransaction.mutate(values, {
+        onSuccess: () => {
+          onClose(id);
+        },
+      });
+    } else {
+      console.log("new Block");
+      newTransaction.mutate(values, {
+        onSuccess: () => {
+          closeNewSheet();
+        },
+      });
+    }
   };
 
   const onDelete = async (id: string) => {
@@ -107,6 +135,8 @@ const TransactionSheet = ({ id }: { id?: string }) => {
             </div>
           ) : (
             <TransactionForm
+              id={transactionQuery?.data?.id}
+              defaultValues={defaultValues}
               onSubmit={onSubmit}
               disabled={isPending}
               accountOptions={accountOptions}

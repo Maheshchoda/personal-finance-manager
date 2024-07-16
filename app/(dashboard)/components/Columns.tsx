@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { client } from "@/lib/hono";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { InferResponseType } from "hono";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, TriangleAlert } from "lucide-react";
 import EditItemSheet from "./EditItemSheet";
 import { useEditItem } from "../hooks/api";
 
@@ -195,18 +195,15 @@ const AccountColumn = ({
     AccountOpen ? onClose(accountId) : onOpen(accountId);
   };
   return (
-    <div>
-      {AccountOpen ? (
-        <EditItemSheet id={accountId} itemName="accounts" />
-      ) : (
-        <div
-          onClick={onClick}
-          className="flex cursor-pointer items-center hover:underline"
-        >
-          {account}
-        </div>
-      )}
-    </div>
+    <>
+      {AccountOpen && <EditItemSheet id={accountId} itemName="accounts" />}
+      <div
+        onClick={onClick}
+        className="flex cursor-pointer items-center hover:underline"
+      >
+        {account}
+      </div>
+    </>
   );
 };
 
@@ -217,25 +214,23 @@ const CategoryColumn = ({
   categoryId: string | null;
   category: string | null;
 }) => {
-  const { isOpen, onOpen } = useEditSheet();
+  const { isOpen, onOpen, onClose } = useEditSheet();
   const CategoryOpen = categoryId && isOpen(categoryId);
   const onClick = () => {
-    if (categoryId) {
-      onOpen(categoryId);
-    }
+    if (categoryId) CategoryOpen ? onClose(categoryId) : onOpen(categoryId);
   };
   return (
     <div>
-      {categoryId && CategoryOpen ? (
-        <EditItemSheet id={categoryId} itemName="categories" />
-      ) : (
-        <div
-          onClick={onClick}
-          className="flex cursor-pointer items-center hover:underline"
-        >
-          {category}
-        </div>
-      )}
+      {CategoryOpen && <EditItemSheet id={categoryId} itemName="categories" />}
+      <div
+        onClick={onClick}
+        className={cn(
+          "flex cursor-pointer items-center hover:underline",
+          !category && "text-rose-500",
+        )}
+      >
+        {category || <TriangleAlert className="mr-2 size-4 shrink-0" />}
+      </div>
     </div>
   );
 };
