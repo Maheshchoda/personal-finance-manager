@@ -114,8 +114,8 @@ const app = new Hono()
             amount: transaction.amount,
             payee: transaction.payee,
             notes: transaction.notes,
-            categoryId: category.id,
-            accountId: account.id,
+            categoryId: transaction.categoryId,
+            accountId: transaction.accountId,
           })
           .from(transaction)
           .innerJoin(account, eq(transaction.accountId, account.id))
@@ -277,7 +277,7 @@ const app = new Hono()
           .where(
             inArray(
               transaction.id,
-              sql`select id from ${transactionsToUpdate}`,
+              sql`(select id from ${transactionsToUpdate})`,
             ),
           )
           .returning();
