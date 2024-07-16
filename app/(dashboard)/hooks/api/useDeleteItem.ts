@@ -31,6 +31,7 @@ const useDeleteItem = (itemName: ItemType) => {
   const onSuccess = () => {
     toast.success(`${CapTrimEnd(itemName, true)} Deleted`);
     queryClient.invalidateQueries({ queryKey: [itemName] });
+    queryClient.invalidateQueries({ queryKey: ["transactions"] });
   };
 
   const onError = () => {
