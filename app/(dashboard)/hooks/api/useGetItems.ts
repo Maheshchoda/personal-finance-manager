@@ -2,6 +2,7 @@ import { ItemType } from "@/components/entities/ItemType";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 import { client } from "@/lib/hono";
+import { convertAmountFromMiliUnits } from "@/lib/utils";
 import { QueryKey, useQuery } from "@tanstack/react-query";
 import { InferResponseType } from "hono";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
@@ -32,6 +33,14 @@ const useGetItems = <T extends ItemType>(itemName: T) => {
     }
 
     const { data } = await response.json();
+
+    if (itemName === "transactions") {
+      return (data as TransactionResponseType).map((transaction) => ({
+        ...transaction,
+        amount: convertAmountFromMiliUnits(transaction.amount),
+      })) as ResponseType<T>;
+    }
+
     return data as ResponseType<T>;
   };
 
