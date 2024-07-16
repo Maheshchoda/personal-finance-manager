@@ -12,7 +12,6 @@ import Columns from "@/app/(dashboard)/components/Columns";
 import { DataTable } from "@/components/Table/DataTable";
 import { ItemType } from "@/components/entities/ItemType";
 import ItemSheet from "@/app/(dashboard)/components/ItemSheet";
-import { TransactionType } from "@/drizzle/schema";
 
 const transactionResource: ItemType = "transactions";
 
@@ -42,16 +41,18 @@ const TransactionsPage = () => {
           </Button>
         </CardHeader>
         <CardContent>
-          {/* <DataTable
-            columns={Columns(categoryResource)}
-            data={categories}
-            disabled={disabledActions}
-            filterKey="name"
-            onDelete={(rows) => {
-              const ids = rows.map((row) => row.original.id);
-              deleteCategoryMutation.mutate({ ids });
-            }}
-          /> */}
+          {
+            <DataTable
+              columns={Columns(transactionResource)}
+              data={transactions}
+              disabled={disabledActions}
+              filterKey="payee"
+              onDelete={(rows) => {
+                const ids = rows.map((row) => row.original.id);
+                deleteTransactionMutation.mutate({ ids });
+              }}
+            />
+          }
         </CardContent>
       </Card>
     </div>
