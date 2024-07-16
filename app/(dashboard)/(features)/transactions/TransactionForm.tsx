@@ -18,6 +18,8 @@ import { convertAmountToMiliUnits } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Trash } from "lucide-react";
+import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 const formSchema = z.object({
   date: z.coerce.date(),
@@ -181,20 +183,20 @@ const TransactionForm = ({
           )}
         />
         <Button disabled={disabled} className="w-full">
-          Create Transaction
+          {id ? "Update Transaction" : "Create Transaction"}
         </Button>
-        {/* {id && onDelete && (
+        {id && onDelete && (
           <Button
             type="button"
             disabled={disabled}
-            onClick={() => onDelete({ id })}
+            onClick={() => onDelete(id)}
             className="w-full"
             variant="outline"
           >
             <Trash className="mr-2 size-4" />
-            Delete {`${CapTrimEnd(itemName, true)}`}
+            Delete {`${CapTrimEnd("transactions", true)}`}
           </Button>
-        )} */}
+        )}
       </form>
     </Form>
   );
