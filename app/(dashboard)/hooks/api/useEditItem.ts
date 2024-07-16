@@ -67,6 +67,9 @@ const useEditItem = ({ id, itemName }: Props) => {
       queryKey: [CapTrimEnd(itemName, true), { id }],
     });
     queryClient.invalidateQueries({ queryKey: [itemName] });
+    if (itemName === "accounts") {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    }
   };
 
   const onError = () => {
