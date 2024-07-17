@@ -14,16 +14,18 @@ const usePostItem = <T extends ItemType>(itemName: T) => {
   const queryClient = useQueryClient();
 
   const createItem = async (json: RequestType<T>) => {
-    const response =
+    const postRequest =
       itemName === "transactions"
-        ? await client.api.transactions.$post({
+        ? client.api.transactions.$post({
             json: json as PostItemRequestTypes["transactions"],
           })
-        : await client.api[
+        : client.api[
             itemName as Exclude<typeof itemName, "transactions">
           ].$post({
             json: json as RequestType<Exclude<typeof itemName, "transactions">>,
           });
+
+    const response = await postRequest;
 
     if (!response.ok) {
       throw new Error(`Failed to create ${CapTrimEnd(itemName, true)}`);
