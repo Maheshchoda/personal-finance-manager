@@ -1,6 +1,5 @@
 "use client";
 
-import useSheet from "@/components/hooks/useSheet";
 import { useGetItems, useBulkDeleteItems } from "@/app/(dashboard)/hooks/api";
 
 import { Button } from "@/components/ui/button";
