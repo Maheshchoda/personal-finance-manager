@@ -4,22 +4,12 @@ import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 import { client } from "@/lib/hono";
 import { convertAmountFromMiliUnits } from "@/lib/utils";
 import { QueryKey, useQuery } from "@tanstack/react-query";
-import { InferResponseType } from "hono";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 
-type TransactionResponseType = InferResponseType<
-  typeof client.api.transactions.$get,
-  200
->["data"];
-
-type DefaultResponseType = InferResponseType<
-  (typeof client.api)[Exclude<ItemType, "transactions">]["$get"],
-  200
->["data"];
-
-type ResponseType<T extends ItemType> = T extends "transactions"
-  ? TransactionResponseType
-  : DefaultResponseType;
+import {
+  MultipleItemsResponseType as ResponseType,
+  MultipleItemsResponseTypes,
+} from "@/app/(dashboard)/hooks/api/apiTypes";
 
 const useGetItems = <T extends ItemType>(itemName: T) => {
   const params = useSearchParams();
@@ -35,10 +25,12 @@ const useGetItems = <T extends ItemType>(itemName: T) => {
     const { data } = await response.json();
 
     if (itemName === "transactions") {
-      return (data as TransactionResponseType).map((transaction) => ({
-        ...transaction,
-        amount: convertAmountFromMiliUnits(transaction.amount),
-      })) as ResponseType<T>;
+      return (data as MultipleItemsResponseTypes["transactions"]).map(
+        (transaction) => ({
+          ...transaction,
+          amount: convertAmountFromMiliUnits(transaction.amount),
+        }),
+      ) as ResponseType<T>;
     }
 
     return data as ResponseType<T>;

@@ -4,20 +4,11 @@ import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 import { client } from "@/lib/hono";
 import { convertAmountFromMiliUnits } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { InferResponseType } from "hono";
 
-type TransactionResponseType = InferResponseType<
-  (typeof client.api.transactions)[":id"]["$get"],
-  200
->["data"];
-type DefaultResponseType = InferResponseType<
-  (typeof client.api)[Exclude<ItemType, "transactions">][":id"]["$get"],
-  200
->["data"];
-
-type ResponseType<T extends ItemType> = T extends "transactions"
-  ? TransactionResponseType
-  : DefaultResponseType;
+import {
+  SingleItemResponseType as ResponseType,
+  SingleItemResponseTypes,
+} from "@/app/(dashboard)/hooks/api/apiTypes";
 
 interface Params<T extends ItemType> {
   id: string;
@@ -38,7 +29,7 @@ const getItem = async <T extends ItemType>({
   const { data } = await response.json();
 
   if (itemName === "transactions") {
-    const transaction = data as TransactionResponseType;
+    const transaction = data as SingleItemResponseTypes["transactions"];
     return {
       ...transaction,
       amount: convertAmountFromMiliUnits(transaction.amount),
