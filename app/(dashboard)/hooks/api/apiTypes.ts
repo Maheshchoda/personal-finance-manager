@@ -52,3 +52,36 @@ export type PostItemResponseTypes = {
 
 export type PostItemRequestType<T extends ItemType> = PostItemRequestTypes[T];
 export type PostItemResponseType<T extends ItemType> = PostItemResponseTypes[T];
+
+// For editing item
+
+type InferPatchRequestType<T> = InferRequestType<T>;
+type InferPatchResponseType<T> = InferResponseType<T>;
+
+export type PatchItemRequestTypes = {
+  transactions: InferPatchRequestType<
+    (typeof client.api)["transactions"][":id"]["$patch"]
+  >["json"];
+  accounts: InferPatchRequestType<
+    (typeof client.api)["accounts"][":id"]["$patch"]
+  >["json"];
+  categories: InferPatchRequestType<
+    (typeof client.api)["categories"][":id"]["$patch"]
+  >["json"];
+};
+
+export type PatchItemResponseTypes = {
+  transactions: InferPatchResponseType<
+    (typeof client.api)["transactions"][":id"]["$patch"]
+  >;
+  accounts: InferPatchResponseType<
+    (typeof client.api)["accounts"][":id"]["$patch"]
+  >;
+  categories: InferPatchResponseType<
+    (typeof client.api)["categories"][":id"]["$patch"]
+  >;
+};
+
+export type PatchItemRequestType<T extends ItemType> = PatchItemRequestTypes[T];
+export type PatchItemResponseType<T extends ItemType> =
+  PatchItemResponseTypes[T];
