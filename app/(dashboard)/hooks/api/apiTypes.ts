@@ -119,3 +119,37 @@ export type DeleteItemRequestType<T extends ItemType> =
   DeleteItemRequestTypes[T];
 export type DeleteItemResponseType<T extends ItemType> =
   DeleteItemResponseTypes[T];
+
+//for bulk deleting items
+
+type InferBulkDeleteRequestType<T> = InferRequestType<T>;
+type InferBulkDeleteResponseType<T> = InferResponseType<T>;
+
+export type BulkDeleteItemRequestTypes = {
+  transactions: InferBulkDeleteRequestType<
+    (typeof client.api.transactions)["bulk-delete"]["$post"]
+  >["json"];
+  accounts: InferBulkDeleteRequestType<
+    (typeof client.api.accounts)["bulk-delete"]["$post"]
+  >["json"];
+  categories: InferBulkDeleteRequestType<
+    (typeof client.api.categories)["bulk-delete"]["$post"]
+  >["json"];
+};
+
+export type BulkDeleteItemResponseTypes = {
+  transactions: InferBulkDeleteResponseType<
+    (typeof client.api.transactions)["bulk-delete"]["$post"]
+  >;
+  accounts: InferBulkDeleteResponseType<
+    (typeof client.api.accounts)["bulk-delete"]["$post"]
+  >;
+  categories: InferBulkDeleteResponseType<
+    (typeof client.api.categories)["bulk-delete"]["$post"]
+  >;
+};
+
+export type BulkDeleteItemRequestType<T extends ItemType> =
+  BulkDeleteItemRequestTypes[T];
+export type BulkDeleteItemResponseType<T extends ItemType> =
+  BulkDeleteItemResponseTypes[T];

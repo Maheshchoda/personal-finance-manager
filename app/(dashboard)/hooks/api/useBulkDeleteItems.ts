@@ -3,20 +3,17 @@ import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 import { client } from "@/lib/hono";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { InferRequestType, InferResponseType } from "hono";
 import { toast } from "sonner";
 
-type RequestType = InferRequestType<
-  (typeof client.api)[ItemType]["bulk-delete"]["$post"]
->["json"];
-type ResponseType = InferResponseType<
-  (typeof client.api)[ItemType]["bulk-delete"]["$post"]
->;
+import {
+  BulkDeleteItemRequestType as RequestType,
+  BulkDeleteItemResponseType as ResponseType,
+} from "@/app/(dashboard)/hooks/api/apiTypes";
 
-const useBulkDeleteItems = (itemName: ItemType) => {
+const useBulkDeleteItems = <T extends ItemType>(itemName: T) => {
   const queryClient = useQueryClient();
 
-  const deleteItem = async (json: RequestType) => {
+  const deleteItem = async (json: RequestType<T>) => {
     const response = await client.api[itemName]["bulk-delete"]["$post"]({
       json,
     });
@@ -25,19 +22,22 @@ const useBulkDeleteItems = (itemName: ItemType) => {
       throw new Error(`Failed to delete ${itemName}`);
     }
 
-    return await response.json();
+    return (await response.json()) as ResponseType<T>;
   };
 
   const onSuccess = () => {
     toast.success(`${CapTrimEnd(itemName)} Deleted.`);
     queryClient.invalidateQueries({ queryKey: [itemName] });
+    if (itemName !== "transactions") {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    }
   };
 
   const onError = () => {
     toast.error(`Failed to delete ${CapTrimEnd(itemName)}.`);
   };
 
-  return useMutation<ResponseType, Error, RequestType>({
+  return useMutation<ResponseType<T>, Error, RequestType<T>>({
     mutationFn: deleteItem,
     onSuccess,
     onError,
