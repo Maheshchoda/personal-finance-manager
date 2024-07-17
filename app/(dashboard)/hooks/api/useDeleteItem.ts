@@ -3,20 +3,17 @@ import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 import { client } from "@/lib/hono";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { InferRequestType, InferResponseType } from "hono";
 import { toast } from "sonner";
 
-type RequestType = InferRequestType<
-  (typeof client.api)[ItemType][":id"]["$delete"]
->["param"];
-type ResponseType = InferResponseType<
-  (typeof client.api)[ItemType][":id"]["$delete"]
->;
+import {
+  DeleteItemRequestType as RequestType,
+  DeleteItemResponseType as ResponseType,
+} from "@/app/(dashboard)/hooks/api/apiTypes";
 
-const useDeleteItem = (itemName: ItemType) => {
+const useDeleteItem = <T extends ItemType>(itemName: T) => {
   const queryClient = useQueryClient();
 
-  const deleteItem = async ({ id }: RequestType) => {
+  const deleteItem = async ({ id }: RequestType<T>) => {
     const response = await client.api[itemName][":id"]["$delete"]({
       param: { id },
     });
@@ -25,20 +22,23 @@ const useDeleteItem = (itemName: ItemType) => {
       throw new Error(`Failed to delete ${CapTrimEnd(itemName, true)}`);
     }
 
-    return await response.json();
+    const deletedId = await response.json();
+    return deletedId as ResponseType<T>;
   };
 
   const onSuccess = () => {
     toast.success(`${CapTrimEnd(itemName, true)} Deleted`);
     queryClient.invalidateQueries({ queryKey: [itemName] });
-    queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    if (itemName !== "transactions") {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    }
   };
 
   const onError = () => {
     toast.error(`Failed to delete ${CapTrimEnd(itemName, true)}.`);
   };
 
-  return useMutation<ResponseType, Error, RequestType>({
+  return useMutation<ResponseType<T>, Error, RequestType<T>>({
     mutationFn: deleteItem,
     onSuccess,
     onError,

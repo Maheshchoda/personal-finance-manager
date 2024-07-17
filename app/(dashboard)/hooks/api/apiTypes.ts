@@ -85,3 +85,37 @@ export type PatchItemResponseTypes = {
 export type PatchItemRequestType<T extends ItemType> = PatchItemRequestTypes[T];
 export type PatchItemResponseType<T extends ItemType> =
   PatchItemResponseTypes[T];
+
+//for deleting Item
+
+type InferDeleteRequestType<T> = InferRequestType<T>;
+type InferDeleteResponseType<T> = InferResponseType<T>;
+
+export type DeleteItemRequestTypes = {
+  transactions: InferDeleteRequestType<
+    (typeof client.api.transactions)[":id"]["$delete"]
+  >["param"];
+  accounts: InferDeleteRequestType<
+    (typeof client.api.accounts)[":id"]["$delete"]
+  >["param"];
+  categories: InferDeleteRequestType<
+    (typeof client.api.categories)[":id"]["$delete"]
+  >["param"];
+};
+
+export type DeleteItemResponseTypes = {
+  transactions: InferDeleteResponseType<
+    (typeof client.api.transactions)[":id"]["$delete"]
+  >;
+  accounts: InferDeleteResponseType<
+    (typeof client.api.accounts)[":id"]["$delete"]
+  >;
+  categories: InferDeleteResponseType<
+    (typeof client.api.categories)[":id"]["$delete"]
+  >;
+};
+
+export type DeleteItemRequestType<T extends ItemType> =
+  DeleteItemRequestTypes[T];
+export type DeleteItemResponseType<T extends ItemType> =
+  DeleteItemResponseTypes[T];
