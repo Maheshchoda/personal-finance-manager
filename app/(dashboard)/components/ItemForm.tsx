@@ -1,3 +1,5 @@
+import { ItemType } from "@/components/entities/ItemType";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -5,29 +7,24 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 import {
   AccountSchema,
   CategorySchema,
   TransactionSchema,
 } from "@/drizzle/schema";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import CapTrimEnd from "@/components/utilities/CapTrimEnd";
+import { convertAmountToMilliUnits } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
-
-import { ItemType } from "@/components/entities/ItemType";
-import { Textarea } from "@/components/ui/textarea";
-import { convertAmountToMiliUnits } from "@/lib/utils";
 import { z } from "zod";
 import AmountInput from "./AmountInput";
 import DatePicker from "./DatePicker";
 import { Select } from "./Select";
 
-const TransactionFormValueSchema = z.object({
+const TransactionFormSchema = z.object({
   date: z.coerce.date(),
   accountId: z.string(),
   categoryId: z.string().nullable().optional(),
@@ -36,49 +33,51 @@ const TransactionFormValueSchema = z.object({
   notes: z.string().nullable().optional(),
 });
 
-const accountSchema = z.object({
+const AccountFormSchema = z.object({
   name: z.string(),
 });
 
-const categorySchema = z.object({
+const CategoryFormSchema = z.object({
   name: z.string(),
 });
 
-export type TransactionFormValues = z.infer<typeof TransactionFormValueSchema>;
-export type AccountFormValues = z.infer<typeof accountSchema>;
-export type CategoryFormValues = z.infer<typeof categorySchema>;
+export type TransactionFormValues = z.infer<typeof TransactionFormSchema>;
+export type AccountFormValues = z.infer<typeof AccountFormSchema>;
+export type CategoryFormValues = z.infer<typeof CategoryFormSchema>;
 
-// Create a union type
-export type FormValueSchemaType =
+// Union type for form values
+export type FormValues =
   | TransactionFormValues
   | AccountFormValues
   | CategoryFormValues;
 
-function getFormValueSchema<T extends ItemType>(itemName: T) {
-  if (itemName === "transactions") {
-    return TransactionFormValueSchema;
-  } else if (itemName === "accounts") {
-    return accountSchema;
-  } else {
-    return categorySchema;
+function getFormSchema<T extends ItemType>(itemType: T) {
+  switch (itemType) {
+    case "transactions":
+      return TransactionFormSchema;
+    case "accounts":
+      return AccountFormSchema;
+    case "categories":
+      return CategoryFormSchema;
+    default:
+      throw new Error(`Unknown item type: ${itemType}`);
   }
 }
-
-const formSubmitSchema = {
+const FormSubmissionSchemas = {
   transactions: TransactionSchema.omit({ id: true }),
   accounts: AccountSchema.pick({ name: true }),
   categories: CategorySchema.pick({ name: true }),
 };
 
-export type FormSubmitType<T extends ItemType> = z.input<
-  (typeof formSubmitSchema)[T]
+export type FormSubmitValues<T extends ItemType> = z.input<
+  (typeof FormSubmissionSchemas)[T]
 >;
 
 interface BaseFormProps<T extends ItemType> {
-  itemName: T;
-  onSubmit: (values: FormSubmitType<T>) => void;
+  itemType: T;
+  onSubmit: (values: FormSubmitValues<T>) => void;
   disabled: boolean;
-  defaultValues: FormValueSchemaType;
+  defaultValues: FormValues;
   accountOptions?: { label: string; value: string }[];
   onAccountCreation?: (name: string) => void;
   categoryOptions?: { label: string; value: string }[];
@@ -98,21 +97,25 @@ interface UpdateFormProps<T extends ItemType> extends BaseFormProps<T> {
 type Props<T extends ItemType> = CreateFormProps<T> | UpdateFormProps<T>;
 
 const ItemForm = <T extends ItemType>(props: Props<T>) => {
-  const { itemName, defaultValues, disabled, onSubmit } = props;
+  const { itemType, defaultValues, disabled, onSubmit } = props;
+  console.log(props, "From the props");
 
-  const form = useForm<FormValueSchemaType>({
-    resolver: zodResolver(getFormValueSchema(itemName)),
+  const form = useForm<FormValues>({
+    resolver: zodResolver(getFormSchema(itemType)),
     defaultValues: defaultValues,
   });
 
-  const handleSubmit = (values: FormValueSchemaType) => {
-    if (itemName === "transactions") {
-      const transaction = values as TransactionFormValues;
-      const amount = parseFloat(transaction.amount);
-      const amountInMiliUnits = convertAmountToMiliUnits(amount);
-      onSubmit({ ...values, amount: amountInMiliUnits } as FormSubmitType<T>);
+  const handleSubmit = (values: FormValues) => {
+    if (itemType === "transactions") {
+      const transactionValues = values as TransactionFormValues;
+      const amount = parseFloat(transactionValues.amount);
+      const amountInMilliUnits = convertAmountToMilliUnits(amount);
+      onSubmit({
+        ...values,
+        amount: amountInMilliUnits,
+      } as FormSubmitValues<T>);
     } else {
-      onSubmit(values as FormSubmitType<T>);
+      onSubmit(values as FormSubmitValues<T>);
     }
   };
 
@@ -122,7 +125,7 @@ const ItemForm = <T extends ItemType>(props: Props<T>) => {
         onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-4 pt-4"
       >
-        {itemName === "transactions" ? (
+        {itemType === "transactions" ? (
           <>
             <FormField
               name="date"
@@ -163,7 +166,7 @@ const ItemForm = <T extends ItemType>(props: Props<T>) => {
                   <FormLabel>Account</FormLabel>
                   <FormControl>
                     <Select
-                      placeholder={"Select an account"}
+                      placeholder="Select an account"
                       options={props.accountOptions}
                       onCreate={props.onAccountCreation}
                       value={field.value}
@@ -182,7 +185,7 @@ const ItemForm = <T extends ItemType>(props: Props<T>) => {
                   <FormLabel>Category</FormLabel>
                   <FormControl>
                     <Select
-                      placeholder={"Select an category"}
+                      placeholder="Select a category"
                       options={props.categoryOptions}
                       onCreate={props.onCategoryCreation}
                       value={field.value}
@@ -217,8 +220,8 @@ const ItemForm = <T extends ItemType>(props: Props<T>) => {
                   <FormLabel>Notes</FormLabel>
                   <FormControl>
                     <Textarea
-                      disabled={disabled}
                       {...field}
+                      disabled={disabled}
                       value={field.value ?? ""}
                       placeholder="Add notes"
                     />
@@ -236,24 +239,23 @@ const ItemForm = <T extends ItemType>(props: Props<T>) => {
                 <FormLabel>Name</FormLabel>
                 <FormControl>
                   <Input
+                    {...field}
                     disabled={disabled}
                     placeholder={
-                      itemName === "accounts"
+                      itemType === "accounts"
                         ? "e.g. Cash, Bank Account, UPI."
                         : "e.g. Food, Utilities, Entertainment."
                     }
-                    {...field}
                   />
                 </FormControl>
               </FormItem>
             )}
           />
         )}
-
         <Button disabled={disabled} className="w-full">
           {props.mode === "update" && props.id
             ? "Save"
-            : `Create ${CapTrimEnd(itemName, true)}`}
+            : `Create ${CapTrimEnd(itemType, true)}`}
         </Button>
         {props.mode === "update" && props.id && props.onDelete && (
           <Button
@@ -264,7 +266,7 @@ const ItemForm = <T extends ItemType>(props: Props<T>) => {
             variant="outline"
           >
             <Trash className="mr-2 size-4" />
-            Delete {`${CapTrimEnd(itemName, true)}`}
+            Delete {`${CapTrimEnd(itemType, true)}`}
           </Button>
         )}
       </form>

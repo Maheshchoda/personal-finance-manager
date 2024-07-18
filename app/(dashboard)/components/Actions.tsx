@@ -16,15 +16,15 @@ import { Edit, MoreHorizontal, Trash } from "lucide-react";
 
 interface Props {
   id: string;
-  itemName: ItemType;
+  itemType: ItemType;
 }
 
-const Actions = ({ id, itemName }: Props) => {
+const Actions = ({ id, itemType }: Props) => {
   const { onOpen, onClose } = useEditSheet();
-  const deleteMutation = useDeleteItem(itemName);
+  const deleteMutation = useDeleteItem(itemType);
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
-    message: `You are about to delete an ${CapTrimEnd(itemName, true)}`,
+    message: `You are about to delete an ${CapTrimEnd(itemType, true)}`,
   });
 
   const handleDelete = async ({ id }: { id: string }) => {
@@ -42,7 +42,7 @@ const Actions = ({ id, itemName }: Props) => {
   };
   return (
     <>
-      <ItemSheet id={id} itemName={itemName} />
+      <ItemSheet id={id} itemType={itemType} />
       <ConfirmationDialog />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

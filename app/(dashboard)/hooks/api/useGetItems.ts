@@ -2,7 +2,7 @@ import { ItemType } from "@/components/entities/ItemType";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 import { client } from "@/lib/hono";
-import { convertAmountFromMiliUnits } from "@/lib/utils";
+import { convertAmountFromMilliUnits } from "@/lib/utils";
 import { QueryKey, useQuery } from "@tanstack/react-query";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 
@@ -11,24 +11,24 @@ import {
   MultipleItemsResponseTypes,
 } from "@/app/(dashboard)/hooks/api/apiTypes";
 
-const useGetItems = <T extends ItemType>(itemName: T) => {
+const useGetItems = <T extends ItemType>(itemType: T) => {
   const params = useSearchParams();
 
   const fetchData = async (): Promise<ResponseType<T>> => {
-    const queryParams = getQueryParams(itemName, params);
-    const response = await client.api[itemName].$get({ query: queryParams });
+    const queryParams = getQueryParams(itemType, params);
+    const response = await client.api[itemType].$get({ query: queryParams });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch ${CapTrimEnd(itemName)}.`);
+      throw new Error(`Failed to fetch ${CapTrimEnd(itemType)}.`);
     }
 
     const { data } = await response.json();
 
-    if (itemName === "transactions") {
+    if (itemType === "transactions") {
       return (data as MultipleItemsResponseTypes["transactions"]).map(
         (transaction) => ({
           ...transaction,
-          amount: convertAmountFromMiliUnits(transaction.amount),
+          amount: convertAmountFromMilliUnits(transaction.amount),
         }),
       ) as ResponseType<T>;
     }
@@ -37,24 +37,24 @@ const useGetItems = <T extends ItemType>(itemName: T) => {
   };
 
   return useQuery<ResponseType<T>, Error>({
-    queryKey: getQueryKey(itemName, params),
+    queryKey: getQueryKey(itemType, params),
     queryFn: fetchData,
   });
 };
 
 const getQueryKey = <T extends ItemType>(
-  itemName: T,
+  itemType: T,
   params: ReadonlyURLSearchParams,
 ): QueryKey => {
-  const queryParams = getQueryParams(itemName, params);
-  return [itemName, queryParams];
+  const queryParams = getQueryParams(itemType, params);
+  return [itemType, queryParams];
 };
 
 const getQueryParams = (
-  itemName: ItemType,
+  itemType: ItemType,
   params: ReadonlyURLSearchParams,
 ) => {
-  if (itemName === "transactions") {
+  if (itemType === "transactions") {
     return {
       from: params.get("from") || "",
       to: params.get("to") || "",

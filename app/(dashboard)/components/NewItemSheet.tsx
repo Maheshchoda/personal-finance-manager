@@ -12,8 +12,8 @@ import AccountCategoryOptions from "@/app/(dashboard)/components/AccountCategory
 import ItemForm, {
   AccountFormValues,
   CategoryFormValues,
-  FormSubmitType,
-  FormValueSchemaType,
+  FormSubmitValues,
+  FormValues,
   TransactionFormValues,
 } from "@/app/(dashboard)/components/ItemForm";
 import { ItemType } from "@/components/entities/ItemType";
@@ -21,10 +21,8 @@ import useEditSheet from "@/components/hooks/useEditSheet";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 import { PostItemRequestType } from "../hooks/api/apiTypes";
 
-const getDefaultValues = <T extends ItemType>(
-  itemName: T,
-): FormValueSchemaType => {
-  if (itemName === "transactions") {
+const getDefaultValues = <T extends ItemType>(itemType: T): FormValues => {
+  if (itemType === "transactions") {
     return {
       date: new Date(),
       accountId: "",
@@ -40,17 +38,17 @@ const getDefaultValues = <T extends ItemType>(
   }
 };
 
-const NewItemSheet = <T extends ItemType>({ itemName }: { itemName: T }) => {
+const NewItemSheet = <T extends ItemType>({ itemType }: { itemType: T }) => {
   const { newSheetOpen, closeNewSheet } = useEditSheet();
   const {
     accountOptions = [],
     categoryOptions = [],
     onAccountCreation = () => {},
     onCategoryCreation = () => {},
-  } = itemName === "transactions" ? AccountCategoryOptions() : {};
-  const mutation = usePostItem(itemName);
-  const onSubmit = (values: FormSubmitType<T>) => {
-    if (itemName === "transactions") {
+  } = itemType === "transactions" ? AccountCategoryOptions() : {};
+  const mutation = usePostItem(itemType);
+  const onSubmit = (values: FormSubmitValues<T>) => {
+    if (itemType === "transactions") {
       mutation.mutate(values as PostItemRequestType<T>, {
         onSuccess: () => {
           closeNewSheet();
@@ -68,30 +66,30 @@ const NewItemSheet = <T extends ItemType>({ itemName }: { itemName: T }) => {
     <Sheet open={newSheetOpen} onOpenChange={closeNewSheet}>
       <SheetContent className="space-y-4">
         <SheetHeader>
-          <SheetTitle>New {CapTrimEnd(itemName, true)}</SheetTitle>
+          <SheetTitle>New {CapTrimEnd(itemType, true)}</SheetTitle>
           <SheetDescription>
             Create a new entry to keep track of your{" "}
-            {CapTrimEnd(itemName, true)}.
+            {CapTrimEnd(itemType, true)}.
           </SheetDescription>
         </SheetHeader>
-        {itemName === "transactions" ? (
+        {itemType === "transactions" ? (
           <ItemForm
             accountOptions={accountOptions}
             categoryOptions={categoryOptions}
             onAccountCreation={onAccountCreation}
             onCategoryCreation={onCategoryCreation}
             mode="create"
-            itemName={itemName}
+            itemType={itemType}
             onSubmit={onSubmit}
-            defaultValues={getDefaultValues(itemName)}
+            defaultValues={getDefaultValues(itemType)}
             disabled={mutation.isPending}
           />
         ) : (
           <ItemForm
             mode="create"
-            itemName={itemName}
+            itemType={itemType}
             onSubmit={onSubmit}
-            defaultValues={getDefaultValues(itemName)}
+            defaultValues={getDefaultValues(itemType)}
             disabled={mutation.isPending}
           />
         )}

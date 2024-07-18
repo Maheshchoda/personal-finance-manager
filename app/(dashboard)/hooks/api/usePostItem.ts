@@ -10,25 +10,25 @@ import {
 } from "@/app/(dashboard)/hooks/api/apiTypes";
 import { toast } from "sonner";
 
-const usePostItem = <T extends ItemType>(itemName: T) => {
+const usePostItem = <T extends ItemType>(itemType: T) => {
   const queryClient = useQueryClient();
 
   const createItem = async (json: RequestType<T>) => {
     const postRequest =
-      itemName === "transactions"
+      itemType === "transactions"
         ? client.api.transactions.$post({
             json: json as PostItemRequestTypes["transactions"],
           })
         : client.api[
-            itemName as Exclude<typeof itemName, "transactions">
+            itemType as Exclude<typeof itemType, "transactions">
           ].$post({
-            json: json as RequestType<Exclude<typeof itemName, "transactions">>,
+            json: json as RequestType<Exclude<typeof itemType, "transactions">>,
           });
 
     const response = await postRequest;
 
     if (!response.ok) {
-      throw new Error(`Failed to create ${CapTrimEnd(itemName, true)}`);
+      throw new Error(`Failed to create ${CapTrimEnd(itemType, true)}`);
     }
 
     const data = await response.json();
@@ -36,13 +36,13 @@ const usePostItem = <T extends ItemType>(itemName: T) => {
   };
 
   const onSuccess = () => {
-    const trimmedName = CapTrimEnd(itemName, true);
+    const trimmedName = CapTrimEnd(itemType, true);
     toast.success(`${trimmedName} Created`);
-    queryClient.invalidateQueries({ queryKey: [itemName] });
+    queryClient.invalidateQueries({ queryKey: [itemType] });
   };
 
   const onError = () => {
-    toast.error(`Failed in creating ${CapTrimEnd(itemName, true)}.`);
+    toast.error(`Failed in creating ${CapTrimEnd(itemType, true)}.`);
   };
 
   return useMutation<ResponseType<T>, Error, RequestType<T>>({

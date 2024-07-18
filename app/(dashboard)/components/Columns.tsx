@@ -31,7 +31,7 @@ type ResponseType<T extends ItemType> = T extends "transactions"
   : DefaultResponseType;
 
 const createColumns = <T extends ItemType>(
-  itemName: T,
+  itemType: T,
 ): ColumnDef<ResponseType<T>>[] => {
   const commonColumns: ColumnDef<ResponseType<T>>[] = [
     {
@@ -58,7 +58,7 @@ const createColumns = <T extends ItemType>(
     },
   ];
 
-  if (itemName === "transactions") {
+  if (itemType === "transactions") {
     const transactionColumns: ColumnDef<TransactionResponseType>[] = [
       {
         accessorKey: "payee",
@@ -149,7 +149,7 @@ const createColumns = <T extends ItemType>(
       },
       {
         id: "actions",
-        cell: ({ row }) => <Actions itemName={itemName} id={row.original.id} />,
+        cell: ({ row }) => <Actions itemType={itemType} id={row.original.id} />,
       },
     ];
 
@@ -172,7 +172,7 @@ const createColumns = <T extends ItemType>(
       },
       {
         id: "actions",
-        cell: ({ row }) => <Actions itemName={itemName} id={row.original.id} />,
+        cell: ({ row }) => <Actions itemType={itemType} id={row.original.id} />,
       },
     ];
 
@@ -196,7 +196,7 @@ const AccountColumn = ({
   };
   return (
     <>
-      {AccountOpen && <EditItemSheet id={accountId} itemName="accounts" />}
+      {AccountOpen && <EditItemSheet id={accountId} itemType="accounts" />}
       <div
         onClick={onClick}
         className="flex cursor-pointer items-center hover:underline"
@@ -221,7 +221,7 @@ const CategoryColumn = ({
   };
   return (
     <div>
-      {CategoryOpen && <EditItemSheet id={categoryId} itemName="categories" />}
+      {CategoryOpen && <EditItemSheet id={categoryId} itemType="categories" />}
       <div
         onClick={onClick}
         className={cn(

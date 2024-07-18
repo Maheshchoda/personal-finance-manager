@@ -9,8 +9,8 @@ import {
 import ItemForm, {
   AccountFormValues,
   CategoryFormValues,
-  FormSubmitType,
-  FormValueSchemaType,
+  FormSubmitValues,
+  FormValues,
   TransactionFormValues,
 } from "@/app/(dashboard)/components/ItemForm";
 import {
@@ -34,10 +34,10 @@ type getItemQueryType<T extends ItemType> = SingleItemResponseType<T>;
 
 const EditItemSheet = <T extends ItemType>({
   id,
-  itemName,
+  itemType,
 }: {
   id: string;
-  itemName: T;
+  itemType: T;
 }) => {
   const { isOpen, closeNewSheet, onClose } = useEditSheet();
   const ItemOpen = isOpen(id);
@@ -46,19 +46,17 @@ const EditItemSheet = <T extends ItemType>({
     categoryOptions = [],
     onAccountCreation = () => {},
     onCategoryCreation = () => {},
-  } = itemName === "transactions" ? AccountCategoryOptions() : {};
-  const getItemQuery = useGetItem<T>({ id, itemName });
-  const editMutation = useEditItem({ id, itemName });
-  const deleteMutation = useDeleteItem(itemName);
+  } = itemType === "transactions" ? AccountCategoryOptions() : {};
+  const getItemQuery = useGetItem<T>({ id, itemType });
+  const editMutation = useEditItem({ id, itemType });
+  const deleteMutation = useDeleteItem(itemType);
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
-    message: `You are about to delete an ${CapTrimEnd(itemName, true)}.`,
+    message: `You are about to delete an ${CapTrimEnd(itemType, true)}.`,
   });
 
-  const getDefaultValues = <T extends ItemType>(
-    itemName: T,
-  ): FormValueSchemaType => {
-    if (itemName === "transactions") {
+  const getDefaultValues = <T extends ItemType>(itemType: T): FormValues => {
+    if (itemType === "transactions") {
       const transaction = getItemQuery.data as getItemQueryType<"transactions">;
       return {
         accountId: transaction.accountId,
@@ -83,7 +81,7 @@ const EditItemSheet = <T extends ItemType>({
     editMutation.isPending ||
     deleteMutation.isPending;
 
-  const onSubmit = (values: FormSubmitType<T>) => {
+  const onSubmit = (values: FormSubmitValues<T>) => {
     editMutation.mutate(values as PostItemRequestType<T>, {
       onSuccess: () => {
         onClose(id);
@@ -111,16 +109,16 @@ const EditItemSheet = <T extends ItemType>({
       <Sheet open={ItemOpen} onOpenChange={() => onClose(id)}>
         <SheetContent className="space-y-4">
           <SheetHeader>
-            <SheetTitle>Edit {`${CapTrimEnd(itemName, true)}`}</SheetTitle>
+            <SheetTitle>Edit {`${CapTrimEnd(itemType, true)}`}</SheetTitle>
             <SheetDescription>
-              Update your {`${CapTrimEnd(itemName, true)}`} information below:
+              Update your {`${CapTrimEnd(itemType, true)}`} information below:
             </SheetDescription>
           </SheetHeader>
           {getItemQuery.isLoading ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <Loader2 className="size-4 animate-spin text-muted-foreground" />
             </div>
-          ) : itemName === "transactions" ? (
+          ) : itemType === "transactions" ? (
             <ItemForm
               id={id}
               onDelete={onDelete}
@@ -129,18 +127,18 @@ const EditItemSheet = <T extends ItemType>({
               onAccountCreation={onAccountCreation}
               onCategoryCreation={onCategoryCreation}
               mode="update"
-              itemName={itemName}
+              itemType={itemType}
               onSubmit={onSubmit}
-              defaultValues={getDefaultValues(itemName)}
+              defaultValues={getDefaultValues(itemType)}
               disabled={isPending}
             />
           ) : (
             <ItemForm
-              itemName={itemName}
+              itemType={itemType}
               mode="update"
               id={id}
               onSubmit={onSubmit}
-              defaultValues={getDefaultValues(itemName)}
+              defaultValues={getDefaultValues(itemType)}
               disabled={isPending}
               onDelete={onDelete}
             />

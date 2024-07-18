@@ -10,16 +10,16 @@ import {
   DeleteItemResponseType as ResponseType,
 } from "@/app/(dashboard)/hooks/api/apiTypes";
 
-const useDeleteItem = <T extends ItemType>(itemName: T) => {
+const useDeleteItem = <T extends ItemType>(itemType: T) => {
   const queryClient = useQueryClient();
 
   const deleteItem = async ({ id }: RequestType<T>) => {
-    const response = await client.api[itemName][":id"]["$delete"]({
+    const response = await client.api[itemType][":id"]["$delete"]({
       param: { id },
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to delete ${CapTrimEnd(itemName, true)}`);
+      throw new Error(`Failed to delete ${CapTrimEnd(itemType, true)}`);
     }
 
     const deletedId = await response.json();
@@ -27,15 +27,15 @@ const useDeleteItem = <T extends ItemType>(itemName: T) => {
   };
 
   const onSuccess = () => {
-    toast.success(`${CapTrimEnd(itemName, true)} Deleted`);
-    queryClient.invalidateQueries({ queryKey: [itemName] });
-    if (itemName !== "transactions") {
+    toast.success(`${CapTrimEnd(itemType, true)} Deleted`);
+    queryClient.invalidateQueries({ queryKey: [itemType] });
+    if (itemType !== "transactions") {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     }
   };
 
   const onError = () => {
-    toast.error(`Failed to delete ${CapTrimEnd(itemName, true)}.`);
+    toast.error(`Failed to delete ${CapTrimEnd(itemType, true)}.`);
   };
 
   return useMutation<ResponseType<T>, Error, RequestType<T>>({

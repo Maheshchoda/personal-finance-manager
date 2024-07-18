@@ -10,31 +10,31 @@ import {
   BulkDeleteItemResponseType as ResponseType,
 } from "@/app/(dashboard)/hooks/api/apiTypes";
 
-const useBulkDeleteItems = <T extends ItemType>(itemName: T) => {
+const useBulkDeleteItems = <T extends ItemType>(itemType: T) => {
   const queryClient = useQueryClient();
 
   const deleteItem = async (json: RequestType<T>) => {
-    const response = await client.api[itemName]["bulk-delete"]["$post"]({
+    const response = await client.api[itemType]["bulk-delete"]["$post"]({
       json,
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to delete ${itemName}`);
+      throw new Error(`Failed to delete ${itemType}`);
     }
 
     return (await response.json()) as ResponseType<T>;
   };
 
   const onSuccess = () => {
-    toast.success(`${CapTrimEnd(itemName)} Deleted.`);
-    queryClient.invalidateQueries({ queryKey: [itemName] });
-    if (itemName !== "transactions") {
+    toast.success(`${CapTrimEnd(itemType)} Deleted.`);
+    queryClient.invalidateQueries({ queryKey: [itemType] });
+    if (itemType !== "transactions") {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     }
   };
 
   const onError = () => {
-    toast.error(`Failed to delete ${CapTrimEnd(itemName)}.`);
+    toast.error(`Failed to delete ${CapTrimEnd(itemType)}.`);
   };
 
   return useMutation<ResponseType<T>, Error, RequestType<T>>({

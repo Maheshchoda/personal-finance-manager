@@ -12,28 +12,28 @@ import {
 
 interface Props {
   id: string;
-  itemName: ItemType;
+  itemType: ItemType;
 }
 
-const useEditItem = <T extends ItemType>({ id, itemName }: Props) => {
+const useEditItem = <T extends ItemType>({ id, itemType }: Props) => {
   const queryClient = useQueryClient();
 
   const updateItem = async (json: RequestType<T>) => {
     const patchRequest =
-      itemName === "transactions"
+      itemType === "transactions"
         ? client.api.transactions[":id"]["$patch"]({
             param: { id },
             json: json as PatchItemRequestTypes["transactions"],
           })
-        : client.api[itemName][":id"]["$patch"]({
+        : client.api[itemType][":id"]["$patch"]({
             param: { id },
-            json: json as RequestType<Exclude<typeof itemName, "transactions">>,
+            json: json as RequestType<Exclude<typeof itemType, "transactions">>,
           });
 
     const response = await patchRequest;
 
     if (!response.ok) {
-      throw new Error(`Failed to update ${CapTrimEnd(itemName, true)}`);
+      throw new Error(`Failed to update ${CapTrimEnd(itemType, true)}`);
     }
 
     const data = await response.json();
@@ -41,19 +41,19 @@ const useEditItem = <T extends ItemType>({ id, itemName }: Props) => {
   };
 
   const onSuccess = () => {
-    toast.success(`${CapTrimEnd(itemName, true)} Updated.`);
+    toast.success(`${CapTrimEnd(itemType, true)} Updated.`);
     queryClient.invalidateQueries({
-      queryKey: [CapTrimEnd(itemName, true), { id }],
+      queryKey: [CapTrimEnd(itemType, true), { id }],
     });
-    queryClient.invalidateQueries({ queryKey: [itemName] });
-    if (itemName !== "transactions") {
+    queryClient.invalidateQueries({ queryKey: [itemType] });
+    if (itemType !== "transactions") {
       //to avoid invalidate transactions twice.
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     }
   };
 
   const onError = () => {
-    toast.error(`Failed in updating ${CapTrimEnd(itemName, true)}.`);
+    toast.error(`Failed in updating ${CapTrimEnd(itemType, true)}.`);
   };
 
   return useMutation<ResponseType<T>, Error, RequestType<T>>({

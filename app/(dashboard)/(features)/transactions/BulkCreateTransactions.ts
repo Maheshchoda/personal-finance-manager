@@ -13,7 +13,7 @@ type ResponseType = InferResponseType<
   (typeof client.api.transactions)["bulk-create"]["$post"]
 >;
 
-const BulkCreateTransactions = (itemName: ItemType) => {
+const BulkCreateTransactions = (itemType: ItemType) => {
   const queryClient = useQueryClient();
 
   const bulkCreate = async (json: RequestType) => {
@@ -22,19 +22,19 @@ const BulkCreateTransactions = (itemName: ItemType) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to create ${itemName}`);
+      throw new Error(`Failed to create ${itemType}`);
     }
 
     return await response.json();
   };
 
   const onSuccess = () => {
-    toast.success(`${CapTrimEnd(itemName)} Created.`);
-    queryClient.invalidateQueries({ queryKey: [itemName] });
+    toast.success(`${CapTrimEnd(itemType)} Created.`);
+    queryClient.invalidateQueries({ queryKey: [itemType] });
   };
 
   const onError = () => {
-    toast.error(`Failed to create ${CapTrimEnd(itemName)}.`);
+    toast.error(`Failed to create ${CapTrimEnd(itemType)}.`);
   };
 
   return useMutation<ResponseType, Error, RequestType>({

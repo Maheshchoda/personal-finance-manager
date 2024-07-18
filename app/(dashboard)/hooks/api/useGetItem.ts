@@ -2,7 +2,7 @@ import { ItemType } from "@/components/entities/ItemType";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 import { client } from "@/lib/hono";
-import { convertAmountFromMiliUnits } from "@/lib/utils";
+import { convertAmountFromMilliUnits } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 
 import {
@@ -12,38 +12,38 @@ import {
 
 interface Params<T extends ItemType> {
   id: string;
-  itemName: T;
+  itemType: T;
 }
 
 const getItem = async <T extends ItemType>({
   id,
-  itemName,
+  itemType,
 }: Params<T>): Promise<ResponseType<T>> => {
   if (!id) {
-    throw new Error(`ID is required to fetch ${CapTrimEnd(itemName, true)}.`);
+    throw new Error(`ID is required to fetch ${CapTrimEnd(itemType, true)}.`);
   }
-  const response = await client.api[itemName][":id"].$get({ param: { id } });
+  const response = await client.api[itemType][":id"].$get({ param: { id } });
   if (!response.ok) {
-    throw new Error(`Failed to fetch ${CapTrimEnd(itemName, true)}.`);
+    throw new Error(`Failed to fetch ${CapTrimEnd(itemType, true)}.`);
   }
   const { data } = await response.json();
 
-  if (itemName === "transactions") {
+  if (itemType === "transactions") {
     const transaction = data as SingleItemResponseTypes["transactions"];
     return {
       ...transaction,
-      amount: convertAmountFromMiliUnits(transaction.amount),
+      amount: convertAmountFromMilliUnits(transaction.amount),
     } as ResponseType<T>;
   }
 
   return data as ResponseType<T>;
 };
 
-const useGetItem = <T extends ItemType>({ id, itemName }: Params<T>) => {
+const useGetItem = <T extends ItemType>({ id, itemType }: Params<T>) => {
   return useQuery<ResponseType<T>, Error>({
     enabled: !!id,
-    queryKey: [`${CapTrimEnd(itemName, true)}`, { id }],
-    queryFn: () => getItem({ id, itemName }),
+    queryKey: [`${CapTrimEnd(itemType, true)}`, { id }],
+    queryFn: () => getItem({ id, itemType }),
   });
 };
 
