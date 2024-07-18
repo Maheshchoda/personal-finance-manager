@@ -14,45 +14,71 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import CapTrimEnd from "@/components/utilities/CapTrimEnd";
 
 import { ItemType } from "@/components/entities/ItemType";
+import { Textarea } from "@/components/ui/textarea";
+import { convertAmountToMiliUnits } from "@/lib/utils";
+import { z } from "zod";
+import AmountInput from "./AmountInput";
 import DatePicker from "./DatePicker";
 import { Select } from "./Select";
-import AmountInput from "./AmountInput";
-import { Textarea } from "@/components/ui/textarea";
 
-const schemas = {
-  accounts: AccountSchema,
-  categories: CategorySchema,
-  transactions: TransactionSchema,
+const TransactionFormValueSchema = z.object({
+  date: z.coerce.date(),
+  accountId: z.string(),
+  categoryId: z.string().nullable().optional(),
+  payee: z.string(),
+  amount: z.string(),
+  notes: z.string().nullable().optional(),
+});
+
+const accountSchema = z.object({
+  name: z.string(),
+});
+
+const categorySchema = z.object({
+  name: z.string(),
+});
+
+export type TransactionFormValues = z.infer<typeof TransactionFormValueSchema>;
+export type AccountFormValues = z.infer<typeof accountSchema>;
+export type CategoryFormValues = z.infer<typeof categorySchema>;
+
+// Create a union type
+export type FormValueSchemaType =
+  | TransactionFormValues
+  | AccountFormValues
+  | CategoryFormValues;
+
+function getFormValueSchema<T extends ItemType>(itemName: T) {
+  if (itemName === "transactions") {
+    return TransactionFormValueSchema;
+  } else if (itemName === "accounts") {
+    return accountSchema;
+  } else {
+    return categorySchema;
+  }
+}
+
+const formSubmitSchema = {
+  transactions: TransactionSchema.omit({ id: true }),
+  accounts: AccountSchema.pick({ name: true }),
+  categories: CategorySchema.pick({ name: true }),
 };
 
-const formSchema = <T extends ItemType>(itemName: T) => {
-  if (itemName === "transactions")
-    return schemas["transactions"].omit({ id: true });
-
-  if (itemName === "accounts") return schemas["accounts"].pick({ name: true });
-
-  if (itemName === "categories")
-    return schemas["categories"].pick({ name: true });
-
-  throw new Error(`Invalid item name: ${itemName}`);
-};
-
-export type FormType<T extends ItemType> = z.input<
-  ReturnType<typeof formSchema<T>>
+export type FormSubmitType<T extends ItemType> = z.input<
+  (typeof formSubmitSchema)[T]
 >;
 
 interface BaseFormProps<T extends ItemType> {
   itemName: T;
-  defaultValues: FormType<T>;
-  onSubmit: (values: FormType<T>) => void;
+  onSubmit: (values: FormSubmitType<T>) => void;
   disabled: boolean;
+  defaultValues: FormValueSchemaType;
   accountOptions?: { label: string; value: string }[];
   onAccountCreation?: (name: string) => void;
   categoryOptions?: { label: string; value: string }[];
@@ -73,14 +99,21 @@ type Props<T extends ItemType> = CreateFormProps<T> | UpdateFormProps<T>;
 
 const ItemForm = <T extends ItemType>(props: Props<T>) => {
   const { itemName, defaultValues, disabled, onSubmit } = props;
-  const schema = formSchema(itemName);
-  const form = useForm<FormType<T>>({
-    resolver: zodResolver(schema),
+
+  const form = useForm<FormValueSchemaType>({
+    resolver: zodResolver(getFormValueSchema(itemName)),
     defaultValues: defaultValues,
   });
 
-  const handleSubmit = (values: FormType<T>) => {
-    onSubmit(values);
+  const handleSubmit = (values: FormValueSchemaType) => {
+    if (itemName === "transactions") {
+      const transaction = values as TransactionFormValues;
+      const amount = parseFloat(transaction.amount);
+      const amountInMiliUnits = convertAmountToMiliUnits(amount);
+      onSubmit({ ...values, amount: amountInMiliUnits } as FormSubmitType<T>);
+    } else {
+      onSubmit(values as FormSubmitType<T>);
+    }
   };
 
   return (
@@ -168,8 +201,7 @@ const ItemForm = <T extends ItemType>(props: Props<T>) => {
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
                     <AmountInput
-                      value={field.value}
-                      onChange={field.onChange}
+                      {...field}
                       disabled={disabled}
                       placeholder="0.00"
                     />

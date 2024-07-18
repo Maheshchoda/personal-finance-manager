@@ -5,9 +5,6 @@ import EditItemSheet from "./EditItemSheet";
 import NewItemSheet from "./NewItemSheet";
 
 const ItemSheet = ({ id, itemName }: { id?: string; itemName: ItemType }) => {
-  if (itemName === "transactions") {
-    return id && <TransactionSheet id={id} />;
-  }
   return (
     <>
       {id ? (
