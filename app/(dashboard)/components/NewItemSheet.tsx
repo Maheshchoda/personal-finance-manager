@@ -38,30 +38,32 @@ const getDefaultValues = <T extends ItemType>(itemType: T): FormValues => {
   }
 };
 
-const NewItemSheet = <T extends ItemType>({ itemType }: { itemType: T }) => {
+interface NewItemSheetProps<T extends ItemType> {
+  itemType: T;
+}
+
+const NewItemSheet = <T extends ItemType>({
+  itemType,
+}: NewItemSheetProps<T>) => {
   const { newSheetOpen, closeNewSheet } = useEditSheet();
+
   const {
     accountOptions = [],
     categoryOptions = [],
     onAccountCreation = () => {},
     onCategoryCreation = () => {},
   } = itemType === "transactions" ? AccountCategoryOptions() : {};
+
   const mutation = usePostItem(itemType);
-  const onSubmit = (values: FormSubmitValues<T>) => {
-    if (itemType === "transactions") {
-      mutation.mutate(values as PostItemRequestType<T>, {
-        onSuccess: () => {
-          closeNewSheet();
-        },
-      });
-    } else {
-      mutation.mutate(values as PostItemRequestType<T>, {
-        onSuccess: () => {
-          closeNewSheet();
-        },
-      });
-    }
+
+  const handleSubmit = (values: FormSubmitValues<T>) => {
+    mutation.mutate(values as PostItemRequestType<T>, {
+      onSuccess: () => {
+        closeNewSheet();
+      },
+    });
   };
+
   return (
     <Sheet open={newSheetOpen} onOpenChange={closeNewSheet}>
       <SheetContent className="space-y-4">
@@ -72,27 +74,17 @@ const NewItemSheet = <T extends ItemType>({ itemType }: { itemType: T }) => {
             {CapTrimEnd(itemType, true)}.
           </SheetDescription>
         </SheetHeader>
-        {itemType === "transactions" ? (
-          <ItemForm
-            accountOptions={accountOptions}
-            categoryOptions={categoryOptions}
-            onAccountCreation={onAccountCreation}
-            onCategoryCreation={onCategoryCreation}
-            mode="create"
-            itemType={itemType}
-            onSubmit={onSubmit}
-            defaultValues={getDefaultValues(itemType)}
-            disabled={mutation.isPending}
-          />
-        ) : (
-          <ItemForm
-            mode="create"
-            itemType={itemType}
-            onSubmit={onSubmit}
-            defaultValues={getDefaultValues(itemType)}
-            disabled={mutation.isPending}
-          />
-        )}
+        <ItemForm
+          accountOptions={accountOptions}
+          categoryOptions={categoryOptions}
+          onAccountCreation={onAccountCreation}
+          onCategoryCreation={onCategoryCreation}
+          mode="create"
+          itemType={itemType}
+          onSubmit={handleSubmit}
+          defaultValues={getDefaultValues(itemType)}
+          disabled={mutation.isPending}
+        />
       </SheetContent>
     </Sheet>
   );

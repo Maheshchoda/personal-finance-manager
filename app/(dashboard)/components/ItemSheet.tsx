@@ -3,15 +3,16 @@ import { ItemType } from "@/components/entities/ItemType";
 import EditItemSheet from "./EditItemSheet";
 import NewItemSheet from "./NewItemSheet";
 
-const ItemSheet = ({ id, itemType }: { id?: string; itemType: ItemType }) => {
-  return (
-    <>
-      {id ? (
-        <EditItemSheet id={id} itemType={itemType} />
-      ) : (
-        <NewItemSheet itemType={itemType} />
-      )}
-    </>
+interface ItemSheetProps {
+  id?: string;
+  itemType: ItemType;
+}
+
+const ItemSheet = ({ id, itemType }: ItemSheetProps) => {
+  return id ? (
+    <EditItemSheet id={id} itemType={itemType} />
+  ) : (
+    <NewItemSheet itemType={itemType} />
   );
 };
 

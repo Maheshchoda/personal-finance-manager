@@ -9,17 +9,17 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import CapTrimEnd from "@/components/utilities/CapTrimEnd";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { Edit, MoreHorizontal, Trash } from "lucide-react";
 
-interface Props {
+interface ActionsProps {
   id: string;
   itemType: ItemType;
 }
 
-const Actions = ({ id, itemType }: Props) => {
+const Actions: React.FC<ActionsProps> = ({ id, itemType }) => {
   const { onOpen, onClose } = useEditSheet();
   const deleteMutation = useDeleteItem(itemType);
   const [ConfirmationDialog, confirm] = useConfirm({
@@ -27,7 +27,7 @@ const Actions = ({ id, itemType }: Props) => {
     message: `You are about to delete an ${CapTrimEnd(itemType, true)}`,
   });
 
-  const handleDelete = async ({ id }: { id: string }) => {
+  const handleDelete = async () => {
     const confirmStatus = await confirm();
     if (confirmStatus) {
       deleteMutation.mutate(
@@ -40,6 +40,7 @@ const Actions = ({ id, itemType }: Props) => {
       );
     }
   };
+
   return (
     <>
       <ItemSheet id={id} itemType={itemType} />
@@ -60,7 +61,7 @@ const Actions = ({ id, itemType }: Props) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             disabled={deleteMutation.isPending}
-            onClick={() => handleDelete({ id })}
+            onClick={handleDelete}
           >
             <Trash className="mr-2 size-4" />
             Delete

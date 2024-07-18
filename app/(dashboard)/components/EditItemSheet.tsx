@@ -5,7 +5,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-
 import ItemForm, {
   AccountFormValues,
   CategoryFormValues,
@@ -30,34 +29,39 @@ import {
   SingleItemResponseType,
 } from "../hooks/api/apiTypes";
 
-type getItemQueryType<T extends ItemType> = SingleItemResponseType<T>;
+type GetItemQueryType<T extends ItemType> = SingleItemResponseType<T>;
+
+interface EditItemSheetProps<T extends ItemType> {
+  id: string;
+  itemType: T;
+}
 
 const EditItemSheet = <T extends ItemType>({
   id,
   itemType,
-}: {
-  id: string;
-  itemType: T;
-}) => {
-  const { isOpen, closeNewSheet, onClose } = useEditSheet();
-  const ItemOpen = isOpen(id);
+}: EditItemSheetProps<T>) => {
+  const { isOpen, onClose } = useEditSheet();
+  const itemOpen = isOpen(id);
+
   const {
     accountOptions = [],
     categoryOptions = [],
     onAccountCreation = () => {},
     onCategoryCreation = () => {},
   } = itemType === "transactions" ? AccountCategoryOptions() : {};
+
   const getItemQuery = useGetItem<T>({ id, itemType });
   const editMutation = useEditItem({ id, itemType });
   const deleteMutation = useDeleteItem(itemType);
+
   const [ConfirmationDialog, confirm] = useConfirm({
     title: "Are you sure?",
     message: `You are about to delete an ${CapTrimEnd(itemType, true)}.`,
   });
 
-  const getDefaultValues = <T extends ItemType>(itemType: T): FormValues => {
+  const getDefaultValues = (itemType: T): FormValues => {
     if (itemType === "transactions") {
-      const transaction = getItemQuery.data as getItemQueryType<"transactions">;
+      const transaction = getItemQuery.data as GetItemQueryType<"transactions">;
       return {
         accountId: transaction.accountId,
         categoryId: transaction.categoryId,
@@ -67,7 +71,7 @@ const EditItemSheet = <T extends ItemType>({
         notes: transaction.notes,
       } as TransactionFormValues;
     } else {
-      const data = getItemQuery.data as getItemQueryType<
+      const data = getItemQuery.data as GetItemQueryType<
         Exclude<ItemType, "transactions">
       >;
       return { name: data.name || "" } as T extends "accounts"
@@ -81,7 +85,7 @@ const EditItemSheet = <T extends ItemType>({
     editMutation.isPending ||
     deleteMutation.isPending;
 
-  const onSubmit = (values: FormSubmitValues<T>) => {
+  const handleSubmit = (values: FormSubmitValues<T>) => {
     editMutation.mutate(values as PostItemRequestType<T>, {
       onSuccess: () => {
         onClose(id);
@@ -89,7 +93,7 @@ const EditItemSheet = <T extends ItemType>({
     });
   };
 
-  const onDelete = async ({ id }: { id: string }) => {
+  const handleDelete = async ({ id }: { id: string }) => {
     const confirmStatus = await confirm();
     if (confirmStatus) {
       deleteMutation.mutate(
@@ -106,7 +110,7 @@ const EditItemSheet = <T extends ItemType>({
   return (
     <div>
       <ConfirmationDialog />
-      <Sheet open={ItemOpen} onOpenChange={() => onClose(id)}>
+      <Sheet open={itemOpen} onOpenChange={() => onClose(id)}>
         <SheetContent className="space-y-4">
           <SheetHeader>
             <SheetTitle>Edit {`${CapTrimEnd(itemType, true)}`}</SheetTitle>
@@ -118,29 +122,19 @@ const EditItemSheet = <T extends ItemType>({
             <div className="absolute inset-0 flex items-center justify-center">
               <Loader2 className="size-4 animate-spin text-muted-foreground" />
             </div>
-          ) : itemType === "transactions" ? (
+          ) : (
             <ItemForm
               id={id}
-              onDelete={onDelete}
+              itemType={itemType}
+              mode="update"
+              onSubmit={handleSubmit}
+              defaultValues={getDefaultValues(itemType)}
+              disabled={isPending}
+              onDelete={handleDelete}
               accountOptions={accountOptions}
               categoryOptions={categoryOptions}
               onAccountCreation={onAccountCreation}
               onCategoryCreation={onCategoryCreation}
-              mode="update"
-              itemType={itemType}
-              onSubmit={onSubmit}
-              defaultValues={getDefaultValues(itemType)}
-              disabled={isPending}
-            />
-          ) : (
-            <ItemForm
-              itemType={itemType}
-              mode="update"
-              id={id}
-              onSubmit={onSubmit}
-              defaultValues={getDefaultValues(itemType)}
-              disabled={isPending}
-              onDelete={onDelete}
             />
           )}
         </SheetContent>
