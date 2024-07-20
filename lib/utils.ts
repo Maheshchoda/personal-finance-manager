@@ -20,3 +20,13 @@ export function formatCurrency(amount: number) {
     minimumFractionDigits: 2,
   }).format(amount);
 }
+
+export function calculatePercentageChange(
+  current: number,
+  previous: number,
+): number {
+  if (previous === 0) {
+    return current === 0 ? 0 : 100; // If previous is 0, handle as 100% change if current is not 0.
+  }
+  return ((current - previous) / Math.abs(previous)) * 100;
+}
