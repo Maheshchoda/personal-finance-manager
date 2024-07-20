@@ -5,7 +5,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
-  PatchItemRequestTypes,
   PatchItemRequestType as RequestType,
   PatchItemResponseType as ResponseType,
 } from "@/app/(dashboard)/hooks/api/apiTypes";
@@ -23,7 +22,7 @@ const useEditItem = <T extends ItemType>({ id, itemType }: Props) => {
       itemType === "transactions"
         ? client.api.transactions[":id"]["$patch"]({
             param: { id },
-            json: json as PatchItemRequestTypes["transactions"],
+            json: json as RequestType<"transactions">,
           })
         : client.api[itemType][":id"]["$patch"]({
             param: { id },

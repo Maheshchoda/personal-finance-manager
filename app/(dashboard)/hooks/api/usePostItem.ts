@@ -4,7 +4,6 @@ import { client } from "@/lib/hono";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
-  PostItemRequestTypes,
   PostItemRequestType as RequestType,
   PostItemResponseType as ResponseType,
 } from "@/app/(dashboard)/hooks/api/apiTypes";
@@ -17,7 +16,7 @@ const usePostItem = <T extends ItemType>(itemType: T) => {
     const postRequest =
       itemType === "transactions"
         ? client.api.transactions.$post({
-            json: json as PostItemRequestTypes["transactions"],
+            json: json as RequestType<"transactions">,
           })
         : client.api[
             itemType as Exclude<typeof itemType, "transactions">

@@ -6,10 +6,7 @@ import { convertAmountFromMilliUnits } from "@/lib/utils";
 import { QueryKey, useQuery } from "@tanstack/react-query";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 
-import {
-  MultipleItemsResponseType as ResponseType,
-  MultipleItemsResponseTypes,
-} from "@/app/(dashboard)/hooks/api/apiTypes";
+import { MultipleItemResponseType as ResponseType } from "@/app/(dashboard)/hooks/api/apiTypes";
 
 const useGetItems = <T extends ItemType>(itemType: T) => {
   const params = useSearchParams();
@@ -25,12 +22,10 @@ const useGetItems = <T extends ItemType>(itemType: T) => {
     const { data } = await response.json();
 
     if (itemType === "transactions") {
-      return (data as MultipleItemsResponseTypes["transactions"]).map(
-        (transaction) => ({
-          ...transaction,
-          amount: convertAmountFromMilliUnits(transaction.amount),
-        }),
-      ) as ResponseType<T>;
+      return (data as ResponseType<"transactions">).map((transaction) => ({
+        ...transaction,
+        amount: convertAmountFromMilliUnits(transaction.amount),
+      })) as ResponseType<T>;
     }
 
     return data as ResponseType<T>;

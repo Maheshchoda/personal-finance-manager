@@ -5,10 +5,7 @@ import { client } from "@/lib/hono";
 import { convertAmountFromMilliUnits } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  SingleItemResponseType as ResponseType,
-  SingleItemResponseTypes,
-} from "@/app/(dashboard)/hooks/api/apiTypes";
+import { SingleItemResponseType as ResponseType } from "@/app/(dashboard)/hooks/api/apiTypes";
 
 interface Params<T extends ItemType> {
   id: string;
@@ -29,7 +26,7 @@ const getItem = async <T extends ItemType>({
   const { data } = await response.json();
 
   if (itemType === "transactions") {
-    const transaction = data as SingleItemResponseTypes["transactions"];
+    const transaction = data as ResponseType<"transactions">;
     return {
       ...transaction,
       amount: convertAmountFromMilliUnits(transaction.amount),

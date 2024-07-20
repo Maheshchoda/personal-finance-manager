@@ -1,155 +1,85 @@
 import { ItemType } from "@/components/entities/ItemType";
-
 import { client } from "@/lib/hono";
 import { InferRequestType, InferResponseType } from "hono";
 
-// For multiple items
-type InferMultipleItemsType<T> = InferResponseType<T, 200>["data"];
+const { transactions, accounts, categories } = client.api;
 
-export type MultipleItemsResponseTypes = {
-  transactions: InferMultipleItemsType<typeof client.api.transactions.$get>;
-  accounts: InferMultipleItemsType<typeof client.api.accounts.$get>;
-  categories: InferMultipleItemsType<typeof client.api.categories.$get>;
-};
+// Helper types for response and request data
+type InferResponseData<T> = InferResponseType<T, 200>["data"];
+type InferRequestData<T> = InferRequestType<T>;
 
-export type MultipleItemsResponseType<T extends ItemType> =
-  MultipleItemsResponseTypes[T];
+// Types for multiple items
+export type MultipleItemResponseType<T extends ItemType> = {
+  transactions: InferResponseData<typeof transactions.$get>;
+  accounts: InferResponseData<typeof accounts.$get>;
+  categories: InferResponseData<typeof categories.$get>;
+}[T];
 
-// For single item
-type InferSingleItemType<T> = InferResponseType<T, 200>["data"];
+// Types for single items
+export type SingleItemResponseType<T extends ItemType> = {
+  transactions: InferResponseData<(typeof transactions)[":id"]["$get"]>;
+  accounts: InferResponseData<(typeof accounts)[":id"]["$get"]>;
+  categories: InferResponseData<(typeof categories)[":id"]["$get"]>;
+}[T];
 
-export type SingleItemResponseTypes = {
-  transactions: InferSingleItemType<
-    (typeof client.api.transactions)[":id"]["$get"]
-  >;
-  accounts: InferSingleItemType<(typeof client.api.accounts)[":id"]["$get"]>;
-  categories: InferSingleItemType<
-    (typeof client.api.categories)[":id"]["$get"]
-  >;
-};
+// Types for posting items
+export type PostItemRequestType<T extends ItemType> = {
+  transactions: InferRequestData<typeof transactions.$post>["json"];
+  accounts: InferRequestData<typeof accounts.$post>["json"];
+  categories: InferRequestData<typeof categories.$post>["json"];
+}[T];
 
-export type SingleItemResponseType<T extends ItemType> =
-  SingleItemResponseTypes[T];
+export type PostItemResponseType<T extends ItemType> = {
+  transactions: InferResponseType<typeof transactions.$post>;
+  accounts: InferResponseType<typeof accounts.$post>;
+  categories: InferResponseType<typeof categories.$post>;
+}[T];
 
-// For posting item
-
-type InferPostRequestType<T> = InferRequestType<T>;
-type InferPostResponseType<T> = InferResponseType<T>;
-
-export type PostItemRequestTypes = {
-  transactions: InferPostRequestType<
-    typeof client.api.transactions.$post
+// Types for editing items
+export type PatchItemRequestType<T extends ItemType> = {
+  transactions: InferRequestData<
+    (typeof transactions)[":id"]["$patch"]
   >["json"];
-  accounts: InferPostRequestType<typeof client.api.accounts.$post>["json"];
-  categories: InferPostRequestType<typeof client.api.categories.$post>["json"];
-};
+  accounts: InferRequestData<(typeof accounts)[":id"]["$patch"]>["json"];
+  categories: InferRequestData<(typeof categories)[":id"]["$patch"]>["json"];
+}[T];
 
-export type PostItemResponseTypes = {
-  transactions: InferPostResponseType<typeof client.api.transactions.$post>;
-  accounts: InferPostResponseType<typeof client.api.accounts.$post>;
-  categories: InferPostResponseType<typeof client.api.categories.$post>;
-};
+export type PatchItemResponseType<T extends ItemType> = {
+  transactions: InferResponseType<(typeof transactions)[":id"]["$patch"]>;
+  accounts: InferResponseType<(typeof accounts)[":id"]["$patch"]>;
+  categories: InferResponseType<(typeof categories)[":id"]["$patch"]>;
+}[T];
 
-export type PostItemRequestType<T extends ItemType> = PostItemRequestTypes[T];
-export type PostItemResponseType<T extends ItemType> = PostItemResponseTypes[T];
-
-// For editing item
-
-type InferPatchRequestType<T> = InferRequestType<T>;
-type InferPatchResponseType<T> = InferResponseType<T>;
-
-export type PatchItemRequestTypes = {
-  transactions: InferPatchRequestType<
-    (typeof client.api)["transactions"][":id"]["$patch"]
-  >["json"];
-  accounts: InferPatchRequestType<
-    (typeof client.api)["accounts"][":id"]["$patch"]
-  >["json"];
-  categories: InferPatchRequestType<
-    (typeof client.api)["categories"][":id"]["$patch"]
-  >["json"];
-};
-
-export type PatchItemResponseTypes = {
-  transactions: InferPatchResponseType<
-    (typeof client.api)["transactions"][":id"]["$patch"]
-  >;
-  accounts: InferPatchResponseType<
-    (typeof client.api)["accounts"][":id"]["$patch"]
-  >;
-  categories: InferPatchResponseType<
-    (typeof client.api)["categories"][":id"]["$patch"]
-  >;
-};
-
-export type PatchItemRequestType<T extends ItemType> = PatchItemRequestTypes[T];
-export type PatchItemResponseType<T extends ItemType> =
-  PatchItemResponseTypes[T];
-
-//for deleting Item
-
-type InferDeleteRequestType<T> = InferRequestType<T>;
-type InferDeleteResponseType<T> = InferResponseType<T>;
-
-export type DeleteItemRequestTypes = {
-  transactions: InferDeleteRequestType<
-    (typeof client.api.transactions)[":id"]["$delete"]
+// Types for deleting items
+export type DeleteItemRequestType<T extends ItemType> = {
+  transactions: InferRequestData<
+    (typeof transactions)[":id"]["$delete"]
   >["param"];
-  accounts: InferDeleteRequestType<
-    (typeof client.api.accounts)[":id"]["$delete"]
-  >["param"];
-  categories: InferDeleteRequestType<
-    (typeof client.api.categories)[":id"]["$delete"]
-  >["param"];
-};
+  accounts: InferRequestData<(typeof accounts)[":id"]["$delete"]>["param"];
+  categories: InferRequestData<(typeof categories)[":id"]["$delete"]>["param"];
+}[T];
 
-export type DeleteItemResponseTypes = {
-  transactions: InferDeleteResponseType<
-    (typeof client.api.transactions)[":id"]["$delete"]
-  >;
-  accounts: InferDeleteResponseType<
-    (typeof client.api.accounts)[":id"]["$delete"]
-  >;
-  categories: InferDeleteResponseType<
-    (typeof client.api.categories)[":id"]["$delete"]
-  >;
-};
+export type DeleteItemResponseType<T extends ItemType> = {
+  transactions: InferResponseType<(typeof transactions)[":id"]["$delete"]>;
+  accounts: InferResponseType<(typeof accounts)[":id"]["$delete"]>;
+  categories: InferResponseType<(typeof categories)[":id"]["$delete"]>;
+}[T];
 
-export type DeleteItemRequestType<T extends ItemType> =
-  DeleteItemRequestTypes[T];
-export type DeleteItemResponseType<T extends ItemType> =
-  DeleteItemResponseTypes[T];
-
-//for bulk deleting items
-
-type InferBulkDeleteRequestType<T> = InferRequestType<T>;
-type InferBulkDeleteResponseType<T> = InferResponseType<T>;
-
-export type BulkDeleteItemRequestTypes = {
-  transactions: InferBulkDeleteRequestType<
-    (typeof client.api.transactions)["bulk-delete"]["$post"]
+// Types for bulk deleting items
+export type BulkDeleteItemRequestType<T extends ItemType> = {
+  transactions: InferRequestData<
+    (typeof transactions)["bulk-delete"]["$post"]
   >["json"];
-  accounts: InferBulkDeleteRequestType<
-    (typeof client.api.accounts)["bulk-delete"]["$post"]
+  accounts: InferRequestData<(typeof accounts)["bulk-delete"]["$post"]>["json"];
+  categories: InferRequestData<
+    (typeof categories)["bulk-delete"]["$post"]
   >["json"];
-  categories: InferBulkDeleteRequestType<
-    (typeof client.api.categories)["bulk-delete"]["$post"]
-  >["json"];
-};
+}[T];
 
-export type BulkDeleteItemResponseTypes = {
-  transactions: InferBulkDeleteResponseType<
-    (typeof client.api.transactions)["bulk-delete"]["$post"]
+export type BulkDeleteItemResponseType<T extends ItemType> = {
+  transactions: InferResponseType<
+    (typeof transactions)["bulk-delete"]["$post"]
   >;
-  accounts: InferBulkDeleteResponseType<
-    (typeof client.api.accounts)["bulk-delete"]["$post"]
-  >;
-  categories: InferBulkDeleteResponseType<
-    (typeof client.api.categories)["bulk-delete"]["$post"]
-  >;
-};
-
-export type BulkDeleteItemRequestType<T extends ItemType> =
-  BulkDeleteItemRequestTypes[T];
-export type BulkDeleteItemResponseType<T extends ItemType> =
-  BulkDeleteItemResponseTypes[T];
+  accounts: InferResponseType<(typeof accounts)["bulk-delete"]["$post"]>;
+  categories: InferResponseType<(typeof categories)["bulk-delete"]["$post"]>;
+}[T];

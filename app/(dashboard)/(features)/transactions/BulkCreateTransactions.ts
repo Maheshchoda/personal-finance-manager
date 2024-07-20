@@ -6,18 +6,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 import { toast } from "sonner";
 
-type RequestType = InferRequestType<
-  (typeof client.api.transactions)["bulk-create"]["$post"]
->["json"];
-type ResponseType = InferResponseType<
-  (typeof client.api.transactions)["bulk-create"]["$post"]
->;
+const transactionPostClient = client.api.transactions["bulk-create"]["$post"];
+
+type RequestType = InferRequestType<typeof transactionPostClient>["json"];
+type ResponseType = InferResponseType<typeof transactionPostClient>;
 
 const BulkCreateTransactions = (itemType: ItemType) => {
   const queryClient = useQueryClient();
 
   const bulkCreate = async (json: RequestType) => {
-    const response = await client.api["transactions"]["bulk-create"]["$post"]({
+    const response = await transactionPostClient({
       json,
     });
 
