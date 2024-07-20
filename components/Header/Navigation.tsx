@@ -33,10 +33,6 @@ const navLinks = [
     href: "/categories",
     label: "Categories",
   },
-  {
-    href: "/settings",
-    label: "Settings",
-  },
 ];
 
 const Navigation = () => {
