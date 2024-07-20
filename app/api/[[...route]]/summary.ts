@@ -6,10 +6,15 @@ import { zValidator } from "@hono/zod-validator";
 import { differenceInDays, parse, subDays } from "date-fns";
 import { and, desc, eq, gte, gt, lte, sql, sum } from "drizzle-orm";
 import { Hono } from "hono";
-import { start } from "repl";
 import { z } from "zod";
 
-const app = new Hono().get(
+// Constants
+const DATE_FORMAT = "yyyy-MM-dd";
+const DAYS_IN_PERIOD = 30;
+
+const app = new Hono();
+
+app.get(
   "/",
   clerkMiddleware(),
   zValidator(
@@ -22,26 +27,18 @@ const app = new Hono().get(
   ),
   async (c) => {
     const auth = getAuth(c);
-
     if (!auth?.userId) {
       return c.json({ error: "Unauthorized" }, 401);
     }
 
     try {
       const { accountId, from, to } = c.req.valid("query");
-
-      const currentDate = new Date();
-      const thirtyDaysAgo = subDays(currentDate, 30);
-
-      const startDate = from
-        ? parse(from, "yyyy-MM-dd", new Date())
-        : thirtyDaysAgo;
-
-      const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : currentDate;
-
-      const currentPeriodLength = differenceInDays(endDate, startDate) + 1;
-      const previousPeriodStartDate = subDays(startDate, currentPeriodLength);
-      const previousPeriodEndDate = subDays(endDate, currentPeriodLength);
+      const {
+        startDate,
+        endDate,
+        previousPeriodStartDate,
+        previousPeriodEndDate,
+      } = getDateRanges(from, to);
 
       const [currentPeriodData] = (await fetchFinancialData({
         fetch: "spentOverview",
@@ -57,7 +54,6 @@ const app = new Hono().get(
         startDate: previousPeriodStartDate,
         endDate: previousPeriodEndDate,
       })) as FinanceOverviewType[];
-
       const activeDays = (await fetchFinancialData({
         fetch: "activeDays",
         accountId,
@@ -66,21 +62,10 @@ const app = new Hono().get(
         endDate: previousPeriodEndDate,
       })) as ActiveDaysType[];
 
-      const changePercentage = {
-        income: calculatePercentageChange(
-          currentPeriodData.income,
-          previousPeriodData.income,
-        ),
-        expenses: calculatePercentageChange(
-          currentPeriodData.expenses,
-          previousPeriodData.expenses,
-        ),
-        balance: calculatePercentageChange(
-          currentPeriodData.balance,
-          previousPeriodData.balance,
-        ),
-      } as FinanceOverviewType;
-
+      const changePercentage = calculateChangePercentage(
+        currentPeriodData,
+        previousPeriodData,
+      );
       const categorySpendingData = await fetchCategorySpending({
         userId: auth.userId,
         accountId,
@@ -88,29 +73,77 @@ const app = new Hono().get(
         endDate,
       });
 
-      const topSpendingCategories = categorySpendingData.slice(0, 3);
-      const otherCategoriesSum = categorySpendingData
-        .slice(3)
-        .reduce((sum, current) => sum + current.totalSpent, 0);
-
-      if (otherCategoriesSum > 0)
-        topSpendingCategories.push({
-          name: "other",
-          totalSpent: otherCategoriesSum,
-        });
-      return c.json({
+      const response = createResponse(
         currentPeriodData,
         previousPeriodData,
         changePercentage,
-        topCategories: topSpendingCategories,
+        categorySpendingData,
         activeDays,
-      });
+      );
+      return c.json(response);
     } catch (error) {
       console.error("Error fetching Transaction Summary:", error);
       return c.json({ error: "Internal Server Error" }, 500);
     }
   },
 );
+
+// Helper Functions
+function getDateRanges(from?: string, to?: string) {
+  const currentDate = new Date();
+  const thirtyDaysAgo = subDays(currentDate, DAYS_IN_PERIOD);
+
+  const startDate = from ? parse(from, DATE_FORMAT, new Date()) : thirtyDaysAgo;
+  const endDate = to ? parse(to, DATE_FORMAT, new Date()) : currentDate;
+
+  const periodLength = differenceInDays(endDate, startDate) + 1;
+  const previousPeriodStartDate = subDays(startDate, periodLength);
+  const previousPeriodEndDate = subDays(endDate, periodLength);
+
+  return { startDate, endDate, previousPeriodStartDate, previousPeriodEndDate };
+}
+
+function calculateChangePercentage(
+  current: FinanceOverviewType,
+  previous: FinanceOverviewType,
+) {
+  return {
+    income: calculatePercentageChange(current.income, previous.income),
+    expenses: calculatePercentageChange(current.expenses, previous.expenses),
+    balance: calculatePercentageChange(current.balance, previous.balance),
+  } as FinanceOverviewType;
+}
+
+function createResponse(
+  currentPeriodData: FinanceOverviewType,
+  previousPeriodData: FinanceOverviewType,
+  changePercentage: FinanceOverviewType,
+  categorySpendingData: {
+    name: string;
+    totalSpent: number;
+  }[],
+  activeDays: ActiveDaysType[],
+) {
+  const topSpendingCategories = categorySpendingData.slice(0, 3);
+  const otherCategoriesSum = categorySpendingData
+    .slice(3)
+    .reduce((sum, current) => sum + current.totalSpent, 0);
+
+  if (otherCategoriesSum > 0) {
+    topSpendingCategories.push({
+      name: "other",
+      totalSpent: otherCategoriesSum,
+    });
+  }
+
+  return {
+    currentPeriodData,
+    previousPeriodData,
+    changePercentage,
+    topCategories: topSpendingCategories,
+    activeDays,
+  };
+}
 
 type fetchType = "activeDays" | "spentOverview";
 
@@ -128,17 +161,17 @@ interface FetchDataParams {
   endDate: Date;
 }
 
-interface fetchFinancialData extends FetchDataParams {
+interface fetchFinancialDataParams extends FetchDataParams {
   fetch: fetchType;
 }
 
-function fetchFinancialData({
+async function fetchFinancialData({
   userId,
   accountId,
   startDate,
   endDate,
   fetch,
-}: fetchFinancialData) {
+}: fetchFinancialDataParams) {
   const incomeQuery =
     sql`SUM(CASE WHEN ${transaction.amount} > 0 THEN ${transaction.amount} ELSE 0 END)`.mapWith(
       Number,
@@ -148,11 +181,13 @@ function fetchFinancialData({
       Number,
     );
   const balanceQuery = sum(transaction.amount).mapWith(Number);
+
   const selectElements = { income: incomeQuery, expenses: expensesQuery };
   const selectedFields =
     fetch === "spentOverview"
       ? { ...selectElements, balance: balanceQuery }
       : { ...selectElements, date: transaction.date };
+
   let query = db
     .select(selectedFields)
     .from(transaction)
@@ -166,21 +201,20 @@ function fetchFinancialData({
       ),
     );
 
-  if (fetch === "spentOverview") {
+  if (fetch === "activeDays") {
     query.groupBy(transaction.date).orderBy(transaction.date);
   }
+
   return query;
 }
 
-function fetchCategorySpending({
+async function fetchCategorySpending({
   userId,
   accountId,
   startDate,
   endDate,
 }: FetchDataParams) {
-  const totalSpentQuery = sql`
-      SUM(ABS(${transaction.amount}))
-    `.mapWith(Number);
+  const totalSpentQuery = sql`SUM(ABS(${transaction.amount}))`.mapWith(Number);
 
   return db
     .select({
