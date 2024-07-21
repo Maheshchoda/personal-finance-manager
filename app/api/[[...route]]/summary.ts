@@ -1,6 +1,6 @@
 import { db } from "@/drizzle";
 import { account, category, transaction } from "@/drizzle/schema";
-import { calculatePercentageChange } from "@/lib/utils";
+import { calculatePercentageChange, fillMissingDays } from "@/lib/utils";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
 import { differenceInDays, parse, subDays } from "date-fns";
@@ -12,9 +12,7 @@ import { z } from "zod";
 const DATE_FORMAT = "yyyy-MM-dd";
 const DAYS_IN_PERIOD = 30;
 
-const app = new Hono();
-
-app.get(
+const app = new Hono().get(
   "/",
   clerkMiddleware(),
   zValidator(
@@ -73,12 +71,13 @@ app.get(
         endDate,
       });
 
+      const days = fillMissingDays({ activeDays, startDate, endDate });
+
       const response = createResponse(
         currentPeriodData,
-        previousPeriodData,
         changePercentage,
         categorySpendingData,
-        activeDays,
+        days,
       );
       return c.json(response);
     } catch (error) {
@@ -116,7 +115,6 @@ function calculateChangePercentage(
 
 function createResponse(
   currentPeriodData: FinanceOverviewType,
-  previousPeriodData: FinanceOverviewType,
   changePercentage: FinanceOverviewType,
   categorySpendingData: {
     name: string;
@@ -137,11 +135,16 @@ function createResponse(
   }
 
   return {
-    currentPeriodData,
-    previousPeriodData,
-    changePercentage,
-    topCategories: topSpendingCategories,
-    activeDays,
+    data: {
+      income: currentPeriodData.income,
+      expenses: currentPeriodData.expenses,
+      balance: currentPeriodData.balance,
+      incomeChange: changePercentage.income,
+      expensesChange: changePercentage.expenses,
+      balanceChange: changePercentage.balance,
+      topSpendingCategories,
+      days: activeDays,
+    },
   };
 }
 
