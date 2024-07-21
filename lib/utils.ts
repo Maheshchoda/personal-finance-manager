@@ -1,5 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
-import { eachDayOfInterval, isSameDay } from "date-fns";
+import { eachDayOfInterval, format, isSameDay, subDays } from "date-fns";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -68,4 +68,36 @@ export function fillMissingDays({
   });
 
   return transactionsByDay;
+}
+
+interface Period {
+  from: string | Date | undefined;
+  to: string | Date | undefined;
+}
+
+export function formatDateRange({ from, to }: Period) {
+  const DAYS_IN_PERIOD = 30;
+  const currentDate = new Date();
+  const thirtyDaysAgo = subDays(currentDate, DAYS_IN_PERIOD);
+
+  if (from && to) {
+    return `${format(from, "LLL dd")} - ${format(to, "LLL dd,y")}`;
+  }
+
+  return `${format(thirtyDaysAgo, "LLL dd")} - ${format(currentDate, "LLL dd,y")}`;
+}
+
+interface FormatPercentage {
+  value: number;
+  addPrefix?: boolean;
+}
+
+export function formatPercentage({ value, addPrefix }: FormatPercentage) {
+  const result = new Intl.NumberFormat("en-IN", {
+    style: "percent",
+  }).format(value / 100);
+
+  if (addPrefix && value > 0) return `+${result}`;
+
+  return result;
 }

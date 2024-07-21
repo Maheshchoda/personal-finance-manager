@@ -2,7 +2,7 @@ import { ItemType } from "@/components/entities/ItemType";
 import { client } from "@/lib/hono";
 import { InferRequestType, InferResponseType } from "hono";
 
-const { transactions, accounts, categories } = client.api;
+const { transactions, accounts, categories, summary } = client.api;
 
 // Helper types for response and request data
 type InferResponseData<T> = InferResponseType<T, 200>["data"];
@@ -83,3 +83,11 @@ export type BulkDeleteItemResponseType<T extends ItemType> = {
   accounts: InferResponseType<(typeof accounts)["bulk-delete"]["$post"]>;
   categories: InferResponseType<(typeof categories)["bulk-delete"]["$post"]>;
 }[T];
+
+// for getting summary of the homepage.
+
+export type GetSummaryRequestType = InferRequestData<
+  typeof summary.$get
+>["query"];
+
+export type GetSummaryResponseType = InferResponseData<typeof summary.$get>;
