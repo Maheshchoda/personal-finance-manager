@@ -19,7 +19,7 @@ interface ChartProps {
     expenses: number;
   }[];
 }
-const Chart = ({ data = [] }: ChartProps) => {
+const TransactionsChart = ({ data = [] }: ChartProps) => {
   const [chartVariant, setChartVariant] = useState("area");
 
   const onVariantChange = (variant: string) => {
@@ -75,4 +75,4 @@ const Chart = ({ data = [] }: ChartProps) => {
   );
 };
 
-export default Chart;
+export default TransactionsChart;
