@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 const Popover = PopoverPrimitive.Root;
 
-const PopoverClose = PopoverPrimitive.Root;
+const PopoverClose = PopoverPrimitive.Close;
 
 const PopoverTrigger = PopoverPrimitive.Trigger;
 
