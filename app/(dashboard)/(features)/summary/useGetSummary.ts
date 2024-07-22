@@ -2,7 +2,6 @@ import {
   GetSummaryRequestType as RequestType,
   GetSummaryResponseType as ResponseType,
 } from "@/app/(dashboard)/hooks/api/apiTypes";
-import { category } from "@/drizzle/schema";
 
 import { client } from "@/lib/hono";
 import { convertAmountFromMilliUnits } from "@/lib/utils";
@@ -45,7 +44,7 @@ const GetSummary = async ({
 
 const useGetSummary = ({ from, to, accountId }: RequestType) => {
   return useQuery<ResponseType, Error>({
-    queryKey: ["summary"],
+    queryKey: ["summary", { from, to, accountId }],
     queryFn: () => GetSummary({ from, to, accountId }),
   });
 };
