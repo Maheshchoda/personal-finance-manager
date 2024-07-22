@@ -9,6 +9,8 @@ import {
 import { FileSearch, PieChart, Radar, Target } from "lucide-react";
 import { useState } from "react";
 import PieVariant from "./PieVariant";
+import RadarVariant from "./RadarVariant";
+import RadialVariant from "./RadialVariant";
 
 interface ChartProps {
   data?: {
@@ -63,8 +65,8 @@ const CategorySpendingChart = ({ data = [] }: ChartProps) => {
         ) : (
           <>
             {chartVariant === "pie" && <PieVariant data={data} />}
-            {/* {chartVariant === "radar" && <RadarVariant data={data} />} */}
-            {/* {chartVariant === "radial" && <RadialVariant data={data} />}  */}
+            {chartVariant === "radar" && <RadarVariant data={data} />}
+            {chartVariant === "radial" && <RadialVariant data={data} />}
           </>
         )}
       </CardContent>
