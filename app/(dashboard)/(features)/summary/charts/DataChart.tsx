@@ -1,7 +1,8 @@
 "use client";
 
 import useGetSummary from "../useGetSummary";
-import Chart from "./Chart";
+import CategorySpendingChart from "./CategorySpendingChart";
+import TransactionsChart from "./TransactionsChart";
 
 const DataChart = () => {
   const { data, isLoading } = useGetSummary({});
@@ -10,8 +11,13 @@ const DataChart = () => {
     return <div> Loading...</div>;
   }
   return (
-    <div>
-      <Chart data={data?.days} />
+    <div className="lg:grid-col-6 grid grid-cols-1 gap-8">
+      <div className="col-span-1 lg:col-span-3 xl:col-span-4">
+        <TransactionsChart data={data?.days} />
+      </div>
+      <div className="col-span-1 lg:col-span-3 xl:col-span-2">
+        <CategorySpendingChart data={data?.topSpendingCategories} />
+      </div>
     </div>
   );
 };
