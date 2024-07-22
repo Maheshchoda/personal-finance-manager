@@ -56,8 +56,8 @@ const app = new Hono().get(
         fetch: "activeDays",
         accountId,
         userId: auth.userId,
-        startDate: previousPeriodStartDate,
-        endDate: previousPeriodEndDate,
+        startDate: startDate,
+        endDate: endDate,
       })) as ActiveDaysType[];
 
       const changePercentage = calculateChangePercentage(
@@ -179,17 +179,31 @@ async function fetchFinancialData({
     sql`SUM(CASE WHEN ${transaction.amount} > 0 THEN ${transaction.amount} ELSE 0 END)`.mapWith(
       Number,
     );
-  const expensesQuery =
+  const expensesBalanceQuery =
     sql`SUM(CASE WHEN ${transaction.amount} < 0 THEN ${transaction.amount} ELSE 0 END)`.mapWith(
       Number,
     );
+
+  const expensesAbsoluteBalanceQuery =
+    sql`SUM(CASE WHEN ${transaction.amount} < 0 THEN ABS(${transaction.amount}) ELSE 0 END)`.mapWith(
+      Number,
+    ); //to represent positive values in graph added ABS
+
   const balanceQuery = sum(transaction.amount).mapWith(Number);
 
-  const selectElements = { income: incomeQuery, expenses: expensesQuery };
+  const baseSelectFields = { income: incomeQuery };
   const selectedFields =
     fetch === "spentOverview"
-      ? { ...selectElements, balance: balanceQuery }
-      : { ...selectElements, date: transaction.date };
+      ? {
+          ...baseSelectFields,
+          balance: balanceQuery,
+          expenses: expensesBalanceQuery,
+        }
+      : {
+          ...baseSelectFields,
+          date: transaction.date,
+          expenses: expensesAbsoluteBalanceQuery,
+        };
 
   let query = db
     .select(selectedFields)

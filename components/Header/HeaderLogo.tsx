@@ -7,7 +7,7 @@ const HeaderLogo = () => {
     <Link href="/">
       <div className="hidden items-center gap-x-2 lg:flex">
         <Image src="/logo.svg" height={28} width={28} alt="logo" />
-        <p className="text-2xl font-semibold text-white">Finance</p>
+        <p className="text-2xl font-semibold text-white">Money Manager</p>
       </div>
     </Link>
   );
