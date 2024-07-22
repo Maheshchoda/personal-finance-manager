@@ -1,6 +1,5 @@
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/utils";
-import { format } from "date-fns";
 
 const CategoriesToolTip = ({ active, payload }: any) => {
   if (!active) return null;

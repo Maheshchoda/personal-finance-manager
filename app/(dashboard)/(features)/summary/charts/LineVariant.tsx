@@ -1,8 +1,8 @@
 import { format } from "date-fns";
 import {
+  CartesianGrid,
   Line,
   LineChart,
-  CartesianGrid,
   ResponsiveContainer,
   Tooltip,
   XAxis,

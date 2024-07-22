@@ -1,9 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import AreaVariant from "./AreaVariant";
-import { AreaChart, BarChart, FileSearch, LineChart } from "lucide-react";
-import BarVariant from "./BarVariant";
-import LineVariant from "./LineVariant";
-import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -11,6 +6,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AreaChart, BarChart, FileSearch, LineChart } from "lucide-react";
+import { useState } from "react";
+import AreaVariant from "./AreaVariant";
+import BarVariant from "./BarVariant";
+import LineVariant from "./LineVariant";
 
 interface ChartProps {
   data?: {
