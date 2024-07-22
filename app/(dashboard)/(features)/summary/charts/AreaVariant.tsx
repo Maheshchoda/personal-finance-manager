@@ -17,7 +17,6 @@ interface AreaVariantProps {
   }[];
 }
 const AreaVariant = ({ data }: AreaVariantProps) => {
-  console.log(data, "Active days Data");
   return (
     <ResponsiveContainer width="100%" height={350}>
       <AreaChart data={data}>
