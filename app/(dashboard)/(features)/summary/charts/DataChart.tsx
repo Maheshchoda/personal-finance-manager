@@ -1,12 +1,17 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import useGetSummary from "../useGetSummary";
 import CategorySpendingChart from "./CategorySpendingChart";
 import ChartLoadingSkeleton from "./ChartLoadingSkeleton";
 import TransactionsChart from "./TransactionsChart";
 
 const DataChart = () => {
-  const { data, isLoading } = useGetSummary({});
+  const params = useSearchParams();
+  const from = params.get("from") || undefined;
+  const to = params.get("to") || undefined;
+  const accountId = params.get("accountId") || undefined;
+  const { data, isLoading } = useGetSummary({ from, to, accountId });
 
   if (isLoading) {
     return (
