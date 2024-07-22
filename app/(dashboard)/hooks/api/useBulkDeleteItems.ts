@@ -31,6 +31,7 @@ const useBulkDeleteItems = <T extends ItemType>(itemType: T) => {
     if (itemType !== "transactions") {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     }
+    queryClient.invalidateQueries({ queryKey: ["summary"] });
   };
 
   const onError = () => {

@@ -1,7 +1,7 @@
 import { HeaderLogo, Navigation, WelcomeMessage } from "@/components/Header";
 import { ClerkLoaded, ClerkLoading, UserButton } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
-import FilterByDate from "./FilterByDate";
+import Filter from "./Filter";
 
 const Header = () => {
   return (
@@ -20,7 +20,7 @@ const Header = () => {
           </ClerkLoaded>
         </div>
         <WelcomeMessage />
-        <FilterByDate />
+        <Filter />
       </nav>
     </header>
   );

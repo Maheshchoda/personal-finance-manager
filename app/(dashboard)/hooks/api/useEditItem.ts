@@ -49,6 +49,7 @@ const useEditItem = <T extends ItemType>({ id, itemType }: Props) => {
       //to avoid invalidate transactions twice.
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     }
+    queryClient.invalidateQueries({ queryKey: ["summary"] });
   };
 
   const onError = () => {

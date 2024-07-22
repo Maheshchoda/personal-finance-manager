@@ -38,6 +38,7 @@ const usePostItem = <T extends ItemType>(itemType: T) => {
     const trimmedName = CapTrimEnd(itemType, true);
     toast.success(`${trimmedName} Created`);
     queryClient.invalidateQueries({ queryKey: [itemType] });
+    queryClient.invalidateQueries({ queryKey: ["summary"] });
   };
 
   const onError = () => {

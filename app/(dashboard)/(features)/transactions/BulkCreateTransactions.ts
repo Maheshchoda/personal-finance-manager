@@ -29,6 +29,7 @@ const BulkCreateTransactions = (itemType: ItemType) => {
   const onSuccess = () => {
     toast.success(`${CapTrimEnd(itemType)} Created.`);
     queryClient.invalidateQueries({ queryKey: [itemType] });
+    queryClient.invalidateQueries({ queryKey: ["summary"] });
   };
 
   const onError = () => {

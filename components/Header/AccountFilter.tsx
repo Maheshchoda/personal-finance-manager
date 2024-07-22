@@ -3,6 +3,7 @@ import qs from "query-string";
 
 import { useGetItems } from "@/app/(dashboard)/hooks/api";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import useGetSummary from "@/app/(dashboard)/(features)/summary/useGetSummary";
 import {
   Select,
   SelectContent,
@@ -16,12 +17,18 @@ const AccountFilter = () => {
   const pathName = usePathname();
 
   const params = useSearchParams();
+
   const accountId = params.get("accountId") || "all";
   const from = params.get("from") || "";
   const to = params.get("to") || "";
 
   const { data: accounts, isLoading: isAccountsLoading } =
     useGetItems("accounts");
+  const { isLoading: isSummaryLoading } = useGetSummary({
+    from,
+    to,
+    accountId,
+  });
 
   const onAccountChange = (selectedAccount: string) => {
     const query = {
@@ -49,7 +56,7 @@ const AccountFilter = () => {
     <Select
       value={accountId}
       onValueChange={onAccountChange}
-      disabled={isAccountsLoading}
+      disabled={isAccountsLoading || isSummaryLoading}
     >
       <SelectTrigger className="h-9 w-full rounded-md border-none bg-white/10 px-3 font-normal text-white outline-none transition hover:bg-white/20 hover:text-white focus:bg-white/30 focus:ring-transparent focus:ring-offset-0 lg:w-auto">
         <SelectValue placeholder="Account" />
