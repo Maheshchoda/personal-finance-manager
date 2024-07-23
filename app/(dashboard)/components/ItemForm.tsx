@@ -98,7 +98,6 @@ type Props<T extends ItemType> = CreateFormProps<T> | UpdateFormProps<T>;
 
 const ItemForm = <T extends ItemType>(props: Props<T>) => {
   const { itemType, defaultValues, disabled, onSubmit } = props;
-  console.log(props, "From the props");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(getFormSchema(itemType)),
@@ -134,7 +133,7 @@ const ItemForm = <T extends ItemType>(props: Props<T>) => {
                 <FormItem>
                   <FormControl>
                     <DatePicker
-                      value={field.value}
+                      {...field}
                       onChange={field.onChange}
                       disabled={field.disabled}
                     />
