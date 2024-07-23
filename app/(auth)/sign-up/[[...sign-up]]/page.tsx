@@ -1,6 +1,7 @@
 import { SignUp, ClerkLoading, ClerkLoaded } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const SignUpPage = () => {
   return (
@@ -12,12 +13,19 @@ const SignUpPage = () => {
             Login or Create account to get back to your dashboard!
           </p>
         </div>
-        <div className="mt-8 flex items-center justify-center">
+        <div className="mt-8 flex flex-col items-center justify-center">
           <ClerkLoaded>
+            <Link
+              className="mb-4 rounded bg-blue-500 px-4 py-2 text-white"
+              href="/sign-in"
+            >
+              SignIn as Guest
+            </Link>
+            <p className="mb-2 text-gray-600">(or)</p>
             <SignUp path="/sign-up" />
           </ClerkLoaded>
           <ClerkLoading>
-            <Loader2 className="" />
+            <Loader2 className="animate-spin text-muted-foreground" />
           </ClerkLoading>
         </div>
       </div>
