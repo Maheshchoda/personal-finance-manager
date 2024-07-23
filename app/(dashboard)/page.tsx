@@ -1,5 +1,6 @@
 import DataGrid from "@/app/(dashboard)/(features)/summary/DataGrid";
 import DataChart from "@/app/(dashboard)/(features)/summary/charts/DataChart";
+import { Metadata } from "next";
 
 export default function DashboardPage() {
   return (
@@ -9,3 +10,9 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+export const metadata: Metadata = {
+  title: "Money Manager - Dashboard",
+  description:
+    "Manage your finances effortlessly with real-time tracking, insights, and comprehensive overviews of your accounts, transactions, and budgets.",
+};
