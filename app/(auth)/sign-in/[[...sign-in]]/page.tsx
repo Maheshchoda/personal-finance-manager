@@ -50,9 +50,9 @@ const SignInPage = () => {
               <>
                 <GuestLoginButton onClick={handleGuestLogin} />
                 <p className="mb-2 text-gray-600">(or)</p>
+                <SignIn path="/sign-in" />
               </>
             )}
-            {!isGuestLoading && <SignIn path="/sign-in" />}
           </ClerkLoaded>
           <ClerkLoading>
             <Loader2 className="animate-spin text-muted-foreground" />
